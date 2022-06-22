@@ -1,24 +1,10 @@
 <?php
 
 Class Question {
+	
 	// DB stuff
 	private $conn;
 	private $table = "questions";
-
-	// Question properties
-	public $id;
-	public $question_text;
-	public $category_id;
-	public $type;
-	public $difficulty;
-
-	// categories table
-	// public $category_name;
-
-	// answers table
-	public $question_id;
-	public $answer;
-	public $correct;
 
 	// Constructor with DB
 	public function __construct($db) {
