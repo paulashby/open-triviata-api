@@ -27,15 +27,27 @@ Class Question {
 
 	// Get questions
 	public function read() {
-		$query = "SELECT q.id, q.question_text, a.answer, a.correct 
-		FROM " . $this->table . " q 
-		INNER JOIN 
-			answers a ON q.id = a.question_id 
-		WHERE a.question_id IN (
-			SELECT id FROM
-				" . $this->table . " q
-			WHERE q.category_id = 10 AND q.difficulty = 'medium'
-		)";
+		
+		// Had to break this into two queries per https://stackoverflow.com/questions/24958367/php-pdo-using-mysql-variables
+		// Filtering conditions such as difficulty = 'easy' go in the first query
+		$query = "SET @randoms = (
+    	SELECT GROUP_CONCAT(id) FROM (
+        SELECT DISTINCT id FROM " . $this->table . " 
+        ORDER BY RAND() 
+        LIMIT 50
+	    ) AS ids);";
+
+	    // Prepare statement
+	    $stmt = $this->conn->prepare($query);
+	    // Execute query
+	    $stmt->execute();
+
+	    // Commented out q.category id for now - we may want it when filtering by category
+		$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct#, q.category_id
+		FROM " . $this->table . " q
+		INNER JOIN answers a ON q.id=a.question_id
+		LEFT JOIN categories c ON q.category_id = c.id
+		WHERE FIND_IN_SET(question_id, @randoms);";
 
 		// Prepare statement
 		$stmt = $this->conn->prepare($query);
