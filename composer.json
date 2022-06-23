@@ -1,0 +1,5 @@
+{
+	"require": {
+        "sunspikes/php-ratelimiter":  "dev-master"
+    }
+}
