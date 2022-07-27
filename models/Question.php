@@ -2,7 +2,8 @@
 
 Class Question {
 	
-	// DB stuff
+	private const MAX_QUESTIONS = 50;
+	
 	private $conn;
 	private $table = "questions";
 
@@ -12,15 +13,18 @@ Class Question {
 	}
 
 	// Get questions
-	public function read() {
-		
-		// Had to break this into two queries per https://stackoverflow.com/questions/24958367/php-pdo-using-mysql-variables
-		// Filtering conditions such as difficulty = 'easy' go in the first query
+	public function read($request_breakdown) {
+
+		$where_clause = $this->buildWhereClause($request_breakdown['attributes']);
+		// Null coalescing operator
+		$limit = $request_breakdown['amount'] ?? self::MAX_QUESTIONS;
+
 		$query = "SET @randoms = (
     	SELECT GROUP_CONCAT(id) FROM (
-        SELECT DISTINCT id FROM " . $this->table . " 
+        SELECT DISTINCT id FROM {$this->table}
+        $where_clause 
         ORDER BY RAND() 
-        LIMIT 50
+        LIMIT $limit
 	    ) AS ids);";
 
 	    // Prepare statement
@@ -28,11 +32,15 @@ Class Question {
 	    // Execute query
 	    $stmt->execute();
 
-	    // Commented out q.category id for now - we may want it when filtering by category
-		$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct#, q.category_id
+	    // !!!! JOINS - INNER JOIN will return only items with corresponding entries (via FOREIGN KEY) in "right" table
+	    // !!!! JOINS - LEFT JOIN will return all matched entries in "left" table, regardless of whether they have corresponding entry (via FOREIGN KEY) in "right" table
+	    // https://www.sqlshack.com/learn-sql-inner-join-vs-left-join/
+	    // So might be worth checking this query...
+
+		$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct
 		FROM " . $this->table . " q
 		INNER JOIN answers a ON q.id=a.question_id
-		LEFT JOIN categories c ON q.category_id = c.id
+		LEFT JOIN categories c ON q.category = c.id
 		WHERE FIND_IN_SET(question_id, @randoms);";
 
 		// Prepare statement
@@ -42,6 +50,28 @@ Class Question {
 
 		return $stmt;
 
+	}
+
+	private function buildWhereClause($attributes) {
+
+		$where = "";
+
+		if (count($attributes)) {
+			$where = "WHERE ";
+			$delimiter = "";
+
+			foreach ($attributes as $attr_name => $attr_value) {
+				$where .= "{$delimiter}{$attr_name}='{$attr_value}'";
+				$delimiter = " AND ";
+			}
+		}
+		/*
+			Need to make sure we're not serving previously-served questions when request includes a token
+			AND id NOT IN ( 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034);
+			 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034 
+
+		*/
+		return $where;
 	}
 
 }
