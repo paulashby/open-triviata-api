@@ -1,2 +1,4 @@
 .DS_Store
 apiconfig.ini
+vendor/
+utilities/RateLimiter/
