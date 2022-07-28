@@ -8,14 +8,7 @@ Class Token {
 	private $token_name;
 	private $token_file;
 
-	// Save the file
-	// file_put_contents($log_info['log_file'], json_encode($log));
-	
 	public function __construct($token_name = false) {
-
-		// Could be called by api_token for a token request or reset - in which case, $token will be false for request, string for reset
-		// OR
-		// Called by main api endpoint, in which case, token will be string
 
 		$token_request = $token_name === false;
 
@@ -44,48 +37,62 @@ Class Token {
 	}
 
 	/**
-	* Get already retrieved question ids for this token
-	*
-	* @return String of comma delimited question ids
-	*/ 
+	 * Get already retrieved question ids for this token
+	 *
+	 * @return String of comma delimited question ids
+	 */ 
 	public function retrieved() {
-		return implode(", ", $this->tokenData());
+
+		return implode(", ", $this->data());
 	}
 
 	/**
-	* Get token name (the bin2hex string used to name the token file)
-	*
-	* @return bin2hex string - effectively, the token as far as user is concerned
-	*/ 
+	 * Get token name (the bin2hex string used to name the token file)
+	 *
+	 * @return bin2hex string - effectively, the token as far as user is concerned
+	 */ 
 	public function tokenName() {
 		return $this->token_name;
 	}
 
 	/**
-	* Assign question ids to this token
-	*/ 
+	 * Assign question ids to this token
+	 */ 
 	public function update($retrieved) {
-		$ids = array_merge($this->tokenData(), $retrieved);
-		file_put_contents($this->token_file, json_encode($ids));
+
+		$token_data = $this->data();
+
+		if (is_array($token_data)) {
+			// Merge latest ids with existing record
+			$retrieved = array_merge($token_data, $retrieved);
+		}		
+		file_put_contents($this->token_file, json_encode($retrieved));
 	}
 
 	/**
-	* Reset the current token ('wipe all past memory')
-	*/ 
+	 * Reset the current token ('wipe all past memory')
+	 * 
+	 * @return Number of bytes written to the file, or false on failure
+	 */ 
 	public function reset() {
-		file_put_contents($this->token_file, json_encode(array()));
+		return file_put_contents($this->token_file, json_encode(array()));
 	}
 
 	/**
-	* Get existing data for this token
-	*
-	* @return array of token data or empty array if no data has yet been stored in the token file
-	*/ 
-	public function tokenData() {
+	 * Get existing data for this token
+	 *
+	 * @return array of question ids or empty array if no data has yet been stored in the token file
+	 */ 
+	private function data() {
 		$token_data = file($this->token_file);
 		return is_array($token_data) ? json_decode($token_data[0]) : array();
 	}
 
+	/**
+	 * Provide Not Found response
+	 *
+	 * @return Array containing not found response code and empty results array
+	 */ 
 	private function notFound() {
 		die(json_encode(array(
 			"response_code" => 3,
