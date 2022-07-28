@@ -71,7 +71,11 @@ Class Question {
 
 			if(strlen($retrieved) > 0) {
 				//Exclude previously-retrieved ids from results
-				$where .= "AND id NOT IN ($retrieved)";
+				if (strlen($where) === 0) {
+					$where = "WHERE id NOT IN ($retrieved)";
+				} else {
+					$where .= "AND id NOT IN ($retrieved)";
+				}
 			}
 		}
 		return $where;
