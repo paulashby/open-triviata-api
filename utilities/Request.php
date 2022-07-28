@@ -2,7 +2,7 @@
 
 Class Request {
 
-	//TODO: Include token in PARAMS array - this is alphanumeric, so will need to revisit the clean() method
+	//TODO: Accept requests with json encoded arrays of ids
 
 	private const PARAMS = array(
 		// Could store validation functions in arrays for amount, category, token, but then how do we distinguish from the enumerated values
