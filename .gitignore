@@ -2,3 +2,4 @@
 apiconfig.ini
 vendor/
 utilities/RateLimiter/
+token_data/
