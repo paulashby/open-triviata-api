@@ -31,7 +31,13 @@ if (array_key_exists('command', $query_params)) {
 		break;
 
 		case 'reset':
-		reset_token($query_params);
+		// Response code 3 for fail, 0 for success
+		$response_code = reset_token($query_params) === false ? 3 : 0;
+		$response = array(
+			'response_code' 	=> $response_code,
+			'token' 		=> $token->tokenName()
+		);
+		echo json_encode($response);
 		break;
 		
 		default:
