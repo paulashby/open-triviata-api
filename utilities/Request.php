@@ -3,20 +3,23 @@
 Class Request {
 
 	//TODO: Include token in PARAMS array - this is alphanumeric, so will need to revisit the clean() method
-	
+
 	private const PARAMS = array(
-		'amount' => "int",
-		'category' => "int",
+		// Could store validation functions in arrays for amount, category, token, but then how do we distinguish from the enumerated values
+		// the firt array element would be an object on the functions vs a string on the enumerations
+		'amount' 	 => 'validateNumeric',
+		'category' 	 => 'validateNumeric',
+		'token' 	 => 'validateAlphanumeric',
 		'difficulty' => array(
 			"easy",
 			"medium",
 			"hard"
 		),
-		'type' => array(
+		'type' 		 => array(
 			"multiple",
 			"boolean"
 		),
-		'encode' => array(
+		'encode' 	 => array(
 			'urlLegacy',
 			'base64',
 			'url3986'
@@ -38,6 +41,7 @@ Class Request {
 	public function breakdown() {
 		return $this->query_config;
 	}
+
 	/**
 	 * Validate (and effectively sanitise) input data
 	 *
@@ -51,7 +55,7 @@ Class Request {
 			if (!array_key_exists($param_name, self::PARAMS)) {
 				die($this->invalidParameter());
 			}
-			// Parameter name accepted
+			// Parameter name accepted			
 			if (is_array(self::PARAMS[$param_name])) {
 				// entry for this parameter name includes a list of expected values - make sure submitted value matches one of these
 				if (!in_array($param_value, self::PARAMS[$param_name])) {
@@ -66,20 +70,42 @@ Class Request {
 				$this->query_config['attributes'][$param_name] = $param_value;
 				continue;
 			}
-			// Value should be numeric
-			if (!is_numeric($param_value)) {
-				die($this->invalidParameter());
-			}
-			if ($param_name === 'amount') {
+			// Use provided validation function
+			call_user_func(array($this, self::PARAMS[$param_name]), $param_value);
+
+			if ($param_name === 'amount' || $param_name === 'token') {
 				// amount is stored separately so we don't pollute $query_config['attributes'] which is used to build WHERE clause of MySQL query
-				$this->query_config['amount'] = $param_value;
+				$this->query_config[$param_name] = $param_value;
 				continue;
 			} 
 			$this->query_config['attributes'][$param_name] = $param_value;
 		}
 	}
+	
 	/**
-	 * Provide invalid parameter response
+	 * Die if not numeric
+	 * 
+	 * @param string $param_value
+	 */ 
+	private function validateNumeric($param_value) {
+		if (!is_numeric($param_value)) {
+			die($this->invalidParameter());
+		}
+	}
+	
+	/**
+	 * Die if not alphanumeric
+	 * 
+	 * @param string $param_value
+	 */ 
+	private function validateAlphanumeric($param_value) {
+		if (!ctype_alnum($param_value)) {
+			die($this->invalidParameter());
+		}
+	}
+
+	/**
+	 * Provide Invalid Parameter response
 	 *
 	 * @return Array containing invalid parameter response code and empty results array
 	 */ 
