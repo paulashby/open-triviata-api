@@ -13,6 +13,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 // https://stackoverflow.com/questions/3003145/how-to-get-the-client-ip-address-in-php
 
 define('REQUESTS_PER_MINUTE', 100);
+define('MAX_QUESTIONS', 50);
 
 // Limiter will prevent data loading and add appropriate headers if rate limit is exceeded (NOTE in case of suspected DDOS, set optional second arg to true - limits every user over 5 minute window)
 $limiter = new SlidingWindow(REQUESTS_PER_MINUTE);
@@ -22,101 +23,111 @@ $limiter->limit($ip);
 $request = new Request($_SERVER['REQUEST_URI']);
 $request_breakdown = $request->breakdown();
 
-if (isset($request_breakdown['encode'])) {
-	include_once "../utilities/Encoder.php";
-	$encoder = new Encoder();
-}
-/*
-if (isset($request_breakdown['token'])) {
-	// This is a token request which is a diff endpoint
-	include_once "../utilities/Token.php";
-	$token = new Token();
-	$retrieved = $token->retrieved($request_breakdown['token']);
-}
-*/
+// Use MAX_QUESTIONS as fallback for amount
+$request_breakdown['amount'] = $request_breakdown['amount'] ?? MAX_QUESTIONS;
 
 // Instantiate database and connect
 $database = new Database();
 $db = $database->connect();
 
-// Instantiate question object
-$question = new Question($db);
+if (isset($request_breakdown['encode'])) {
+	include_once "../utilities/Encoder.php";
+	$encoder = new Encoder();
+}
+
+$token = false;
+
+if (isset($request_breakdown['token'])) {
+	include_once "../utilities/Token.php";
+	$token = new Token($request_breakdown['token']);
+}
+
+$question = new Question($db, MAX_QUESTIONS, $token);
 
 // Question query
 $result = $question->read($request_breakdown);
+
 // Get row count
 $num = $result->rowCount();
 
-// Check that num == amount requested
+// This is no good as we get multiple rows for each question
+if ($num === 0 ) {
+	token_empty();
+}
 
-/*
+$retrieved = array();
+$questions_arr = array();
+$questions_arr['results'] = array();
+$question_item = array(
+	'id' => 0
+);
 
-	Tokens
-	------
-	Trickier than might first appear. Need to -
-	• Generate token
-	• Store tokens with list of previously-served questions
-	• Exclude previously-served questions from further responses
-	• Reset token - keep it, but wipe out records of previously-served questions
+while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 
-*/
+	extract($row); // This allows us to access fields directly ($id) rather than via row ($row['id'])
 
-// Check for questions
-if($num > 0) {
-	$questions_arr = array();
-	$questions_arr['results'] = array();
-	$question_item = array(
-		'id' => 0
-	);
+	if($id !== $question_item['id']) {
 
-	while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-
-		extract($row); // This allows us to access fields directly ($id) rather than via row ($row['id'])
-
-		if($id !== $question_item['id']) {
-			
-			// New question or first in list
-			if(count($question_item) > 1) {
-				// This is a new question - current question_item is complete. Push to results and start new
-				array_push($questions_arr['results'], $question_item); 
-			}
-
-			if (isset($request_breakdown['encode'])) {
-				$question_text = $encoder->encode($question_text, $request_breakdown['encode']);
-			}
-
-			$question_item = $question_item = array(
-				'category' 			=> $category,
-				'type' 				=> $type,
-				'difficulty'		=> $difficulty,
-				'question' 			=> $question_text,
-				'id' 				=> $id,
-				'correct_answer'	=> "",
-				'incorrect_answers' => array()
-			);
+		// Keep record of retrieved question ids for current token so we can ensure unique results
+		$retrieved[] = $id;
+		
+		// New question or first in list
+		if(count($question_item) > 1) {
+			// This is a new question - current question_item is complete. Push to results and start new
+			array_push($questions_arr['results'], $question_item); 
 		}
 
-		if($type == "boolean") {
-			$question_item['correct_answer'] = $correct ? "True" : "False";
-			$question_item['incorrect_answers'][] = $correct ? "False" : "True";
-
-		} else if($correct) {
-			// Multiple choice
-			$question_item['correct_answer'] = $answer;
-		} else {
-			$question_item["incorrect_answers"][] = $answer;
+		if (isset($request_breakdown['encode'])) {
+			$question_text = $encoder->encode($question_text, $request_breakdown['encode']);
 		}
+
+		$question_item = array(
+			'category' 			=> $category,
+			'type' 				=> $type,
+			'difficulty'		=> $difficulty,
+			'question' 			=> $question_text,
+			'id' 				=> $id,
+			'correct_answer'	=> "",
+			'incorrect_answers' => array()
+		);
 	}
-	// Push final item to results as this isn't pushed in while loop
-	array_push($questions_arr['results'], $question_item);
 
-	// $questions_arr['ip'] = $ip; // Debug rate limiter
+	if($type == "boolean") {
+		$question_item['correct_answer'] = $correct ? "True" : "False";
+		$question_item['incorrect_answers'][] = $correct ? "False" : "True";
 
-	// Output as JSON
-	echo json_encode($questions_arr);
-} else {
-	// No questions
-	echo json_encode(
-		array('message'=>"No questions found")
-	);
+	} else if($correct) {
+		// Multiple choice
+		$question_item['correct_answer'] = $answer;
+	} else {
+		$question_item["incorrect_answers"][] = $answer;
+	}
+}
+// Push final item to results as this isn't pushed in while loop
+array_push($questions_arr['results'], $question_item);
+
+// Can't just check num rows as each question has multiple, so we either check this here after assembling the questions or do a separate DB call to check
+if (count($retrieved) !== $request_breakdown['amount']) {
+	token_empty();	
+}
+
+if(isset($token)) {
+	// Write question ids to token
+	$token->update($retrieved);
+}
+
+// Output as JSON
+echo json_encode($questions_arr);
+
+/**
+ * Provide Empty Token response
+ *
+ * @return Array containing empty token response code and empty results array
+ */ 
+function token_empty() {
+	// Query returned incorrect number of questions
+	die(json_encode(array(
+		'response_code' => 4,
+		'results' => array()
+	)));
 }
