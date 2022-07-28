@@ -2,40 +2,40 @@
 
 Class Question {
 	
-	private const MAX_QUESTIONS = 50;
-	
-	private $conn;
 	private $table = "questions";
+	private $conn;
+	private $max_questions;
+	private $token;
 
 	// Constructor with DB
-	public function __construct($db) {
+	public function __construct($db, $max_questions, $token) {
 		$this->conn = $db;
+		$this->max_questions = $max_questions;
+		$this->token = $token;
 	}
 
 	// Get questions
 	public function read($request_breakdown) {
 
 		$where_clause = $this->buildWhereClause($request_breakdown['attributes']);
-		// Null coalescing operator
-		$limit = $request_breakdown['amount'] ?? self::MAX_QUESTIONS;
 
 		$query = "SET @randoms = (
-    	SELECT GROUP_CONCAT(id) FROM (
-        SELECT DISTINCT id FROM {$this->table}
-        $where_clause 
-        ORDER BY RAND() 
-        LIMIT $limit
-	    ) AS ids);";
+		SELECT GROUP_CONCAT(id) FROM (
+		SELECT DISTINCT id FROM {$this->table}
+		$where_clause 
+		ORDER BY RAND() 
+		LIMIT {$request_breakdown['amount']}
+		) AS ids);";
 
-	    // Prepare statement
-	    $stmt = $this->conn->prepare($query);
-	    // Execute query
-	    $stmt->execute();
+		// Prepare statement
+		$stmt = $this->conn->prepare($query);
+		// Execute query
+		$stmt->execute();
 
-	    // !!!! JOINS - INNER JOIN will return only items with corresponding entries (via FOREIGN KEY) in "right" table
-	    // !!!! JOINS - LEFT JOIN will return all matched entries in "left" table, regardless of whether they have corresponding entry (via FOREIGN KEY) in "right" table
-	    // https://www.sqlshack.com/learn-sql-inner-join-vs-left-join/
-	    // So might be worth checking this query...
+		// !!!! JOINS - INNER JOIN will return only items with corresponding entries (via FOREIGN KEY) in "right" table
+		// !!!! JOINS - LEFT JOIN will return all matched entries in "left" table, regardless of whether they have corresponding entry (via FOREIGN KEY) in "right" table
+		// https://www.sqlshack.com/learn-sql-inner-join-vs-left-join/
+		// So might be worth checking this query...
 
 		$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct
 		FROM " . $this->table . " q
@@ -49,7 +49,6 @@ Class Question {
 		$stmt->execute();
 
 		return $stmt;
-
 	}
 
 	private function buildWhereClause($attributes) {
@@ -65,13 +64,16 @@ Class Question {
 				$delimiter = " AND ";
 			}
 		}
-		/*
-			Need to make sure we're not serving previously-served questions when request includes a token
-			AND id NOT IN ( 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034);
-			 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034 
 
-		*/
+		if (isset($this->token)) {
+			// Get previously-retrieved ids for this token
+			$retrieved = $this->token->retrieved();
+
+			if(strlen($retrieved) > 0) {
+				//Exclude previously-retrieved ids from results
+				$where .= "AND id NOT IN ($retrieved)";
+			}
+		}
 		return $where;
 	}
-
 }
