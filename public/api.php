@@ -50,7 +50,6 @@ $result = $question->read($request_breakdown);
 // Get row count
 $num = $result->rowCount();
 
-// This is no good as we get multiple rows for each question
 if ($num === 0 ) {
 	token_empty();
 }
