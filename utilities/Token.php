@@ -42,7 +42,6 @@ Class Token {
 	 * @return String of comma delimited question ids
 	 */ 
 	public function retrieved() {
-
 		return implode(", ", $this->data());
 	}
 
