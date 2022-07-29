@@ -43,6 +43,8 @@ Class Question {
 		// Execute query
 		$stmt->execute();
 
+		error_log("stmt is " . print_r($stmt, true));
+
 		return $stmt;
 	}
 
@@ -60,7 +62,7 @@ Class Question {
 			}
 		}
 
-		if (isset($this->token)) {
+		if ($this->token !== false) {
 			// Get previously-retrieved ids for this token
 			$retrieved = $this->token->retrieved();
 

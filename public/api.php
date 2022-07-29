@@ -50,7 +50,7 @@ $result = $question->read($request_breakdown);
 // Get row count
 $num = $result->rowCount();
 
-if ($num === 0 ) {
+if ($token && $num === 0 ) {
 	token_empty();
 }
 
@@ -106,11 +106,10 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 array_push($questions_arr['results'], $question_item);
 
 // Can't just check num rows as each question has multiple, so we either check this here after assembling the questions or do a separate DB call to check
-if (count($retrieved) !== $request_breakdown['amount']) {
-	token_empty();	
-}
-
-if(isset($token)) {
+if ($token) {
+	if (count($retrieved) !== $request_breakdown['amount']) {
+		token_empty();
+	}	
 	// Write question ids to token
 	$token->update($retrieved);
 }
