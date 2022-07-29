@@ -43,8 +43,6 @@ Class Question {
 		// Execute query
 		$stmt->execute();
 
-		error_log("stmt is " . print_r($stmt, true));
-
 		return $stmt;
 	}
 
