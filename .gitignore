@@ -2,4 +2,5 @@
 apiconfig.ini
 vendor/
 utilities/RateLimiter/
+req_log/
 token_data/
