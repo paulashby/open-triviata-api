@@ -32,15 +32,10 @@ Class Question {
 		// Execute query
 		$stmt->execute();
 
-		// !!!! JOINS - INNER JOIN will return only items with corresponding entries (via FOREIGN KEY) in "right" table
-		// !!!! JOINS - LEFT JOIN will return all matched entries in "left" table, regardless of whether they have corresponding entry (via FOREIGN KEY) in "right" table
-		// https://www.sqlshack.com/learn-sql-inner-join-vs-left-join/
-		// So might be worth checking this query...
-
 		$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct
 		FROM " . $this->table . " q
 		INNER JOIN answers a ON q.id=a.question_id
-		LEFT JOIN categories c ON q.category = c.id
+		INNER JOIN categories c ON q.category = c.id
 		WHERE FIND_IN_SET(question_id, @randoms);";
 
 		// Prepare statement
