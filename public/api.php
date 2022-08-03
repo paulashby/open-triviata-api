@@ -107,7 +107,7 @@ array_push($questions_arr['results'], $question_item);
 
 // Can't just check num rows as each question has multiple, so we either check this here after assembling the questions or do a separate DB call to check
 if ($token) {
-	if (count($retrieved) !== $request_breakdown['amount']) {
+	if (count($retrieved) !== (int)$request_breakdown['amount']) {
 		token_empty();
 	}	
 	// Write question ids to token
