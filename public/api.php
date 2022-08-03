@@ -8,9 +8,7 @@ include_once "../models/question.php";
 include_once "../utilities/Request.php";
 include_once "../utilities/RateLimiter/SlidingWindow.php";
 
-$ip = $_SERVER['REMOTE_ADDR'];
-// Seems like this is most reliable method, BUT read this for security concerns (fine I think as I'm not using it to grant access to anything private)
-// https://stackoverflow.com/questions/3003145/how-to-get-the-client-ip-address-in-php
+$ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
 
 define('REQUESTS_PER_MINUTE', 100);
 define('MAX_QUESTIONS', 50);
@@ -29,8 +27,8 @@ $request_breakdown['amount'] = $request_breakdown['amount'] ?? MAX_QUESTIONS;
 // Instantiate database and connect
 $database = new Database();
 $db = $database->connect();
-
-if (isset($request_breakdown['encode'])) {
+$encode = isset($request_breakdown['encode']);
+if ($encode) {
 	include_once "../utilities/Encoder.php";
 	$encoder = new Encoder();
 }
@@ -72,23 +70,22 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 		
 		// New question or first in list
 		if(count($question_item) > 1) {
-			// This is a new question - current question_item is complete. Push to results and start new
+			// This is a new question - push to results and start new
+			if ($encode) {
+				$question_item = encode_item($question_item, $encoder, $request_breakdown['encode']);
+			}
+			// Push to results
 			array_push($questions_arr['results'], $question_item); 
 		}
-
-		if (isset($request_breakdown['encode'])) {
-			$question_text = $encoder->encode($question_text, $request_breakdown['encode']);
-		}
-
 		$question_item = array(
-			'category' 			=> $category,
-			'type' 				=> $type,
-			'difficulty'		=> $difficulty,
-			'question' 			=> $question_text,
-			'id' 				=> $id,
-			'correct_answer'	=> "",
-			'incorrect_answers' => array()
-		);
+				'category' 			=> $category,
+				'type' 				=> $type,
+				'difficulty'		=> $difficulty,
+				'question' 			=> $question_text,
+				'id' 				=> $id,
+				'correct_answer'	=> "",
+				'incorrect_answers' => array()
+			);
 	}
 
 	if($type == "boolean") {
@@ -102,7 +99,11 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 		$question_item["incorrect_answers"][] = $answer;
 	}
 }
-// Push final item to results as this isn't pushed in while loop
+// Process final item as this isn't handled in while loop
+if ($encode) {
+	$question_item = encode_item($question_item, $encoder, $request_breakdown['encode']);
+}
+// Push final item to results
 array_push($questions_arr['results'], $question_item);
 
 // Can't just check num rows as each question has multiple, so we either check this here after assembling the questions or do a separate DB call to check
@@ -128,4 +129,30 @@ function token_empty() {
 		'response_code' => 4,
 		'results' => array()
 	)));
+}
+
+/**
+ * Encode question item
+ *
+ * @param associative array $question_item: question details - category, difficulty etc (the entry for incorrect answers is an array)
+ * @param object $encoder: instance of the Encoder class
+ * @param string $method: the name of the required encoding method
+ * @return associative array with encoded values
+ */ 
+function encode_item($question_item, $encoder, $method) {
+
+	// Encode assembled question
+	foreach ($question_item as $attribute => $attribute_value) {
+		if (is_array($attribute_value)) {
+			// Encode indiviual elements
+			$encoded_array = array();
+			foreach ($attribute_value as $attrib) {
+				$encoded_array[] = $encoder->encode($attrib, $method);
+			}
+			$question_item[$attribute] = $encoded_array;
+		} else {
+			$question_item[$attribute] = $encoder->encode($attribute_value, $method);
+		}
+	}
+	return $question_item;
 }
