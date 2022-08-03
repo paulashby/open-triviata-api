@@ -29,7 +29,8 @@ if (!array_key_exists('category', $query_params) || !is_numeric($query_params['c
 }
 $category = $query_params['category'];
 
-$query = "SELECT COUNT(q.id) AS count, q.difficulty FROM questions AS q
+$query = "SELECT COUNT(q.id) AS count, q.difficulty 
+FROM questions AS q
 INNER JOIN categories ON q.category = categories.id
 WHERE q.category = $category
 GROUP BY q.difficulty;";
@@ -40,8 +41,6 @@ $stmt->execute();
 
 // Get row count
 $num = $stmt->rowCount();
-
-error_log("num = $num");
 
 if ($num === 0 ) {
 	die(json_encode(array(
