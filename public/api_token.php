@@ -6,7 +6,7 @@ header("Content-Type: application/json");
 include_once "../utilities/RateLimiter/SlidingWindow.php";
 
 // Initialise rate limiter
-$ip = $_SERVER['REMOTE_ADDR'];
+$ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
 define('REQUESTS_PER_MINUTE', 100);
 $limiter = new SlidingWindow(REQUESTS_PER_MINUTE);
 $limiter->limit($ip);
@@ -35,7 +35,7 @@ if (array_key_exists('command', $query_params)) {
 		$response_code = reset_token($query_params) === false ? 3 : 0;
 		$response = array(
 			'response_code' 	=> $response_code,
-			'token' 		=> $token->tokenName()
+			'token' 			=> $query_params['token']
 		);
 		echo json_encode($response);
 		break;

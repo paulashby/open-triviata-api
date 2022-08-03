@@ -6,7 +6,7 @@ header("Content-Type: application/json");
 include_once "../config/Database.php";
 include_once "../utilities/RateLimiter/SlidingWindow.php";
 
-$ip = $_SERVER['REMOTE_ADDR'];
+$ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
 
 define('REQUESTS_PER_MINUTE', 100);
 
