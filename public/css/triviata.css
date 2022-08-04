@@ -1,0 +1,66 @@
+body {
+	background-color: #383e4e;
+}
+.container {
+	margin-top: 4rem;
+}
+#logo {
+	margin-bottom: 3rem;
+}
+h1 {
+	font-size: 3rem;
+}
+h3 {
+	margin-top: 0;
+}
+a {
+	color: #ffff24;
+}
+a:hover {
+	color: #f95326;
+}
+.form-control {
+	margin-bottom: 2rem;
+}
+.well .form-control {
+	margin-top: 0.5rem;
+}
+.btn {
+	background-color: #262628;
+	border-color: #262628;
+	border-radius: 0px;
+	border-width: 0px;
+	font-size: 150%;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+.btn:focus,
+.btn:hover,
+.btn:active {
+	outline: none;
+	background-color: #535568;
+	border-color: #535568;	
+}
+.btn-doc {
+	margin-top: 2.5rem;
+}
+#btn-gen-url {
+	margin-bottom: 4rem;
+}
+#appInfo {
+	height: auto;
+	display: block;
+}
+#appInfo.collapse {
+	display: none;
+}
+.alert strong {
+	color: #ffff24;
+	display: block;
+	margin: -0.5rem 0 0.5rem;
+	text-transform: uppercase;
+}
+.alert-success {
+	background-color: #f95326;
+	border-color: #f95326;
+}
