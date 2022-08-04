@@ -28,16 +28,16 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 	}
 
 	$url = $base_url;
-	$prefix = "api.php?";
+	$delimiter = "api.php?";
 
 	foreach ($_POST as $param_name => $param_val) {
 
 		$param_val = filter_var($param_val, FILTER_SANITIZE_STRING);
 
 		if ($param_val !== "any" && $param_val !== "default"  && $param_name !== "token") {
-			$url .= $prefix;
+			$url .= $delimiter;
 			$url .= "$param_name=$param_val";
-			$prefix = "&";
+			$delimiter = "&";
 		}
 	}
 } else {
