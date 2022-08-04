@@ -4,3 +4,6 @@ vendor/
 utilities/RateLimiter/
 req_log/
 token_data/
+public/idcount.php
+public/img/
+queries.sql
