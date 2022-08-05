@@ -4,18 +4,46 @@ Class Question {
 	
 	private $table = "questions";
 	private $conn;
-	private $max_questions;
 	private $token;
 
 	// Constructor with DB
-	public function __construct($db, $max_questions, $token) {
+	public function __construct($db, $token) {
 		$this->conn = $db;
-		$this->max_questions = $max_questions;
 		$this->token = $token;
 	}
 
-	// Get questions
+	/**
+	 * Route data to appropriate read method
+	 *
+	 * @param array $request_breakdown: parameter name/value pairs
+	 * @return array of retrieved question data
+	 */ 
 	public function read($request_breakdown) {
+		return array_key_exists('ids', $request_breakdown) ? $this->readByID($request_breakdown) : $this->readRandom($request_breakdown);
+	}
+
+	// Get questions with provided ids
+	private function readByID($request_breakdown) {
+
+		$ids = $request_breakdown['ids'];
+
+		$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct
+		FROM " . $this->table . " q
+		INNER JOIN answers a ON q.id=a.question_id
+		INNER JOIN categories c ON q.category = c.id
+		WHERE q.id IN($ids)
+		ORDER BY FIELD(q.id,$ids);";
+
+		// Prepare statement
+		$stmt = $this->conn->prepare($query);
+		// Execute query
+		$stmt->execute();
+
+		return $stmt;	
+	}
+
+	// Get random questions
+	private function readRandom($request_breakdown) {
 
 		$where_clause = $this->buildWhereClause($request_breakdown['attributes']);
 
@@ -25,54 +53,54 @@ Class Question {
 		$where_clause 
 		ORDER BY RAND() 
 		LIMIT {$request_breakdown['amount']}
-		) AS ids);";
+	) AS ids);";
 
-		// Prepare statement
-		$stmt = $this->conn->prepare($query);
-		// Execute query
-		$stmt->execute();
+	// Prepare statement
+	$stmt = $this->conn->prepare($query);
+	// Execute query
+	$stmt->execute();
 
-		$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct
-		FROM " . $this->table . " q
-		INNER JOIN answers a ON q.id=a.question_id
-		INNER JOIN categories c ON q.category = c.id
-		WHERE FIND_IN_SET(question_id, @randoms);";
+	$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct
+	FROM " . $this->table . " q
+	INNER JOIN answers a ON q.id=a.question_id
+	INNER JOIN categories c ON q.category = c.id
+	WHERE FIND_IN_SET(question_id, @randoms);";
 
-		// Prepare statement
-		$stmt = $this->conn->prepare($query);
-		// Execute query
-		$stmt->execute();
+	// Prepare statement
+	$stmt = $this->conn->prepare($query);
+	// Execute query
+	$stmt->execute();
 
-		return $stmt;
+	return $stmt;
+}
+
+private function buildWhereClause($attributes) {
+
+	$where = "";
+
+	if (count($attributes)) {
+		$where = "WHERE ";
+		$delimiter = "";
+
+		foreach ($attributes as $attr_name => $attr_value) {
+			$where .= "{$delimiter}{$attr_name}='{$attr_value}'";
+			$delimiter = " AND ";
+		}
 	}
 
-	private function buildWhereClause($attributes) {
+	if ($this->token !== false) {
+		// Get previously-retrieved ids for this token
+		$retrieved = $this->token->retrieved();
 
-		$where = "";
-
-		if (count($attributes)) {
-			$where = "WHERE ";
-			$delimiter = "";
-
-			foreach ($attributes as $attr_name => $attr_value) {
-				$where .= "{$delimiter}{$attr_name}='{$attr_value}'";
-				$delimiter = " AND ";
-			}
-		}
-
-		if ($this->token !== false) {
-			// Get previously-retrieved ids for this token
-			$retrieved = $this->token->retrieved();
-
-			if(strlen($retrieved) > 0) {
+		if(strlen($retrieved) > 0) {
 				//Exclude previously-retrieved ids from results
-				if (strlen($where) === 0) {
-					$where = "WHERE id NOT IN ($retrieved)";
-				} else {
-					$where .= "AND id NOT IN ($retrieved)";
-				}
+			if (strlen($where) === 0) {
+				$where = "WHERE id NOT IN ($retrieved)";
+			} else {
+				$where .= "AND id NOT IN ($retrieved)";
 			}
 		}
-		return $where;
 	}
+	return $where;
+}
 }
