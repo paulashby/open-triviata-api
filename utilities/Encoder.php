@@ -10,18 +10,23 @@ Class Encoder {
 	 * @return string - the encoded string
 	 */ 
 	public function encode ($str, $method) {
-		return call_user_func(array($this, $method), $str);
+		// Decode entities before re-encoding
+		return call_user_func(array($this, $method), html_entity_decode($str));
 	}
 
-	public function urlLegacy ($str) {
-		return urlencode($str);
+	private function default ($str) {
+		return htmlentities($str, ENT_QUOTES);
 	}
 
-	public function url3986 ($str) {
+	private function urlLegacy ($str) {
+		return urlencode($str);		
+	}
+
+	private function url3986 ($str) {
 		return rawurlencode($str);
 	}
 
-	public function base64 ($str) {
+	private function base64 ($str) {
 		return base64_encode($str);
 	}
 }
