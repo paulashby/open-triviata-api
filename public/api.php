@@ -18,29 +18,23 @@ $limiter = new SlidingWindow(REQUESTS_PER_MINUTE);
 $limiter->limit($ip);
 
 // Validate and sanitise user input
-$request = new Request($_SERVER['REQUEST_URI']);
+$request = new Request($_SERVER['REQUEST_URI'], MAX_QUESTIONS);
 $request_breakdown = $request->breakdown();
-
-// Use MAX_QUESTIONS as fallback for amount
-$request_breakdown['amount'] = $request_breakdown['amount'] ?? MAX_QUESTIONS;
 
 // Instantiate database and connect
 $database = new Database();
 $db = $database->connect();
-$encode = isset($request_breakdown['encode']);
-if ($encode) {
-	include_once "../utilities/Encoder.php";
-	$encoder = new Encoder();
-}
+
+include_once "../utilities/Encoder.php";
+$encoder = new Encoder();
 
 $token = false;
-
 if (isset($request_breakdown['token'])) {
 	include_once "../utilities/Token.php";
 	$token = new Token($request_breakdown['token']);
 }
 
-$question = new Question($db, MAX_QUESTIONS, $token);
+$question = new Question($db, $token);
 
 // Question query
 $result = $question->read($request_breakdown);
@@ -71,21 +65,19 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 		// New question or first in list
 		if(count($question_item) > 1) {
 			// This is a new question - push to results and start new
-			if ($encode) {
-				$question_item = encode_item($question_item, $encoder, $request_breakdown['encode']);
-			}
+			$question_item = encode_item($question_item, $encoder, $request_breakdown['encode']);
 			// Push to results
 			array_push($questions_arr['results'], $question_item); 
 		}
 		$question_item = array(
-				'category' 			=> $category,
-				'type' 				=> $type,
-				'difficulty'		=> $difficulty,
-				'question' 			=> $question_text,
-				'id' 				=> $id,
-				'correct_answer'	=> "",
-				'incorrect_answers' => array()
-			);
+			'category' 			=> $category,
+			'type' 				=> $type,
+			'difficulty'		=> $difficulty,
+			'question' 			=> $question_text,
+			'id' 				=> $id,
+			'correct_answer'	=> "",
+			'incorrect_answers' => array()
+		);
 	}
 
 	if($type == "boolean") {
@@ -100,9 +92,7 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 	}
 }
 // Process final item as this isn't handled in while loop
-if ($encode) {
-	$question_item = encode_item($question_item, $encoder, $request_breakdown['encode']);
-}
+$question_item = encode_item($question_item, $encoder, $request_breakdown['encode']);
 // Push final item to results
 array_push($questions_arr['results'], $question_item);
 
