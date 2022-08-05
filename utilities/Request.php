@@ -2,11 +2,7 @@
 
 Class Request {
 
-	//TODO: Accept requests with json encoded arrays of ids
-
 	private const PARAMS = array(
-		// Could store validation functions in arrays for amount, category, token, but then how do we distinguish from the enumerated values
-		// the firt array element would be an object on the functions vs a string on the enumerations
 		'amount' 	 => 'validateNumeric',
 		'category' 	 => 'validateNumeric',
 		'token' 	 => 'validateAlphanumeric',
@@ -27,10 +23,16 @@ Class Request {
 	);
 
 	private $query_config = array(
-		'attributes' => array()
+		'attributes'	=> array(),
+		'encode' 		=> 'default'
 	);
+
+	private $max_questions;
 	
-	public function __construct($url) {
+	public function __construct($url, $max_questions) {
+
+		$this->max_questions = $max_questions;
+
 		// Parse parameters and store in $query_params array
 		$parts = parse_url($url, PHP_URL_QUERY);
 		parse_str($parts, $query_params);
@@ -43,11 +45,47 @@ Class Request {
 	}
 
 	/**
+	 * Route data to appropriate cleaning method
+	 *
+	 * @param array $query_params: parameter name/value pairs
+	 */ 
+	private function clean($query_params) {
+
+		return array_key_exists('ids', $query_params) ? $this->cleanIDs($query_params) : $this->cleanParams($query_params);
+
+	}
+
+	/**
+	 * Validate (and effectively sanitise) IDs and encoding type
+	 *
+	 * @param array $query_params: parameter name/value pairs
+	 */ 
+	private function cleanIDs($query_params) {
+
+		$ids = $query_params['ids'];
+
+		array_filter(explode(',', $ids), array($this, 'validateNumeric'));
+
+		$this->query_config['ids'] = $ids;
+
+		if (isset($query_params['encode'])) {
+
+			$encode = $query_params['encode'];
+
+			if (!in_array($encode, self::PARAMS['encode'])) {
+				die($this->invalidParameter());
+			}
+			$this->query_config['encode'] = $encode;
+		}
+
+	}
+
+	/**
 	 * Validate (and effectively sanitise) input data
 	 *
 	 * @param array $query_params: parameter name/value pairs
 	 */ 
-	public function clean($query_params) {
+	private function cleanParams($query_params) {
 
 		foreach ($query_params as $param_name => $param_value) {
 
@@ -77,8 +115,14 @@ Class Request {
 				// amount is stored separately so we don't pollute $query_config['attributes'] which is used to build WHERE clause of MySQL query
 				$this->query_config[$param_name] = $param_value;
 				continue;
-			} 
+			} 			
 			$this->query_config['attributes'][$param_name] = $param_value;
+		}
+		// Ensure amount is set and within limit
+		if (isset($this->query_config['amount'])) {
+			$this->query_config['amount'] = min($this->query_config['amount'], $this->max_questions);
+		} else {
+			$this->query_config['amount'] = $this->max_questions;
 		}
 	}
 	
