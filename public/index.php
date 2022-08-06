@@ -100,8 +100,10 @@ $conn = $database->connect();
 							<p>
 								To get started using the Open Triviata Database API, use this URL: <input type='text' class='form-control' value='<?=$base_url?>api.php?amount=10' readonly=''>
 								For more settings or help using the API, read along below. Alternatively, you can use the helper form to craft your specific query.
+							</p>							
+							<p>
+								To retrieve one or more questions by ID number, simply use the 'ids' parameter with a comma-separated list (NOTE: all other parameters will be discarded with the exception of encode - see below): <input type='text' class='form-control' value='<?=$base_url?>api.php?ids=1,500,1000' readonly=''>
 							</p>
-
 							<h3>Session Tokens</h3>
 							<p>
 							 	Session Tokens are unique keys that will help keep track of the questions the API has already retrieved. By appending a Session Token to a API Call, the API will never give you the same
