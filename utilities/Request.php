@@ -62,10 +62,9 @@ Class Request {
 	 */ 
 	private function cleanIDs($query_params) {
 
-		$ids = $query_params['ids'];
+		$ids = explode(',', $query_params['ids']);
 
-		array_filter(explode(',', $ids), array($this, 'validateNumeric'));
-
+		$this->query_config['ids'] = array_filter($ids, array($this, 'validateNumeric'));
 		$this->query_config['ids'] = $ids;
 
 		if (isset($query_params['encode'])) {
