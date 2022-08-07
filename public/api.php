@@ -65,7 +65,7 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 		// New question or first in list
 		if(count($question_item) > 1) {
 			// This is a new question - push to results and start new
-			$question_item = encode_item($question_item, $encoder, $request_breakdown['encode']);
+			$question_item = $encoder->encodeItem($question_item, $request_breakdown['encode']);
 			// Push to results
 			array_push($questions_arr['results'], $question_item); 
 		}
@@ -92,7 +92,7 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 	}
 }
 // Process final item as this isn't handled in while loop
-$question_item = encode_item($question_item, $encoder, $request_breakdown['encode']);
+$question_item = $encoder->encodeItem($question_item, $request_breakdown['encode']);
 // Push final item to results
 array_push($questions_arr['results'], $question_item);
 
@@ -119,30 +119,4 @@ function token_empty() {
 		'response_code' => 4,
 		'results' => array()
 	)));
-}
-
-/**
- * Encode question item
- *
- * @param associative array $question_item: question details - category, difficulty etc (the entry for incorrect answers is an array)
- * @param object $encoder: instance of the Encoder class
- * @param string $method: the name of the required encoding method
- * @return associative array with encoded values
- */ 
-function encode_item($question_item, $encoder, $method) {
-
-	// Encode assembled question
-	foreach ($question_item as $attribute => $attribute_value) {
-		if (is_array($attribute_value)) {
-			// Encode indiviual elements
-			$encoded_array = array();
-			foreach ($attribute_value as $attrib) {
-				$encoded_array[] = $encoder->encode($attrib, $method);
-			}
-			$question_item[$attribute] = $encoded_array;
-		} else {
-			$question_item[$attribute] = $encoder->encode($attribute_value, $method);
-		}
-	}
-	return $question_item;
 }
