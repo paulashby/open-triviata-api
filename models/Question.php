@@ -26,18 +26,19 @@ Class Question {
 	private function readByID($request_breakdown) {
 
 		$ids = $request_breakdown['ids'];
+		$placeholder = implode(',', array_fill(0, count($ids), '?'));
 
 		$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct
-		FROM " . $this->table . " q
+		FROM questions q
 		INNER JOIN answers a ON q.id=a.question_id
 		INNER JOIN categories c ON q.category = c.id
-		WHERE q.id IN($ids)
-		ORDER BY FIELD(q.id,$ids);";
+		WHERE q.id IN($placeholder)
+		ORDER BY FIELD(q.id,$placeholder);";
 
 		// Prepare statement
 		$stmt = $this->conn->prepare($query);
-		// Execute query
-		$stmt->execute();
+		// Execute query - include all ids for both placeholders
+		$stmt->execute(array_merge($ids, $ids));
 
 		return $stmt;	
 	}
@@ -49,19 +50,18 @@ Class Question {
 
 		$query = "SET @randoms = (
 		SELECT GROUP_CONCAT(id) FROM (
-		SELECT DISTINCT id FROM {$this->table}
-		$where_clause 
+		SELECT DISTINCT id FROM questions ?
 		ORDER BY RAND() 
-		LIMIT {$request_breakdown['amount']}
+		LIMIT ?
 	) AS ids);";
 
 	// Prepare statement
 	$stmt = $this->conn->prepare($query);
 	// Execute query
-	$stmt->execute();
+	$stmt->execute(array($where_clause, $request_breakdown['amount']));
 
 	$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct
-	FROM " . $this->table . " q
+	FROM questions q
 	INNER JOIN answers a ON q.id=a.question_id
 	INNER JOIN categories c ON q.category = c.id
 	WHERE FIND_IN_SET(question_id, @randoms);";
