@@ -5,7 +5,7 @@ header("Content-Type: application/json");
 
 include_once "../config/Database.php";
 include_once "../models/question.php";
-include_once "../utilities/Request.php";
+include_once "../utilities/Validator.php";
 include_once "../utilities/RateLimiter/SlidingWindow.php";
 
 $ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
