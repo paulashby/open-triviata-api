@@ -17,9 +17,9 @@ define('MAX_QUESTIONS', 50);
 $limiter = new SlidingWindow(REQUESTS_PER_MINUTE);
 $limiter->limit($ip);
 
-// Validate and sanitise user input
-$request = new Request($_SERVER['REQUEST_URI'], MAX_QUESTIONS);
-$request_breakdown = $request->breakdown();
+// Validate user input - amount, category and token are permitted only if numeric/alphanumeric; all other parameters are checked against permitted values
+$validator = new Validator($_SERVER['REQUEST_URI'], MAX_QUESTIONS);
+$request_breakdown = $validator->validate();
 
 // Instantiate database and connect
 $database = new Database();

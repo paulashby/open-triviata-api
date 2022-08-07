@@ -1,6 +1,6 @@
 <?php
 
-Class Request {
+Class Validator {
 
 	private const PARAMS = array(
 		'amount' 	 => 'validateNumeric',
@@ -40,7 +40,7 @@ Class Request {
 		// Validate (and effectively sanitise) values
 		$this->clean($query_params);		
 	}
-	public function breakdown() {
+	public function validate() {
 		return $this->query_config;
 	}
 
