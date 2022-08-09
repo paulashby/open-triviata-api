@@ -46,61 +46,86 @@ Class Question {
 	// Get random questions
 	private function readRandom($request_breakdown) {
 
-		$where_clause = $this->buildWhereClause($request_breakdown['attributes']);
+		$attributes = $request_breakdown['attributes'];
+		$where_clause = $this->buildWhereClause($attributes);
 
-		$query = "SET @randoms = (
-		SELECT GROUP_CONCAT(id) FROM (
-		SELECT DISTINCT id FROM questions ?
-		ORDER BY RAND() 
-		LIMIT ?
-	) AS ids);";
+		if ($where_clause) {
 
-	// Prepare statement
-	$stmt = $this->conn->prepare($query);
-	// Execute query
-	$stmt->execute(array($where_clause, $request_breakdown['amount']));
+			$query = "SET @randoms = (
+			SELECT GROUP_CONCAT(id) FROM (
+			SELECT DISTINCT id FROM questions
+			WHERE $where_clause
+			ORDER BY RAND() 
+			LIMIT :amount
+			) AS ids);";
 
-	$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct
-	FROM questions q
-	INNER JOIN answers a ON q.id=a.question_id
-	INNER JOIN categories c ON q.category = c.id
-	WHERE FIND_IN_SET(question_id, @randoms);";
+			// Prepare statement
+			$stmt = $this->conn->prepare($query);
 
-	// Prepare statement
-	$stmt = $this->conn->prepare($query);
-	// Execute query
-	$stmt->execute();
+			foreach ($attributes as $attribute_name => &$attribute_value) {
+				$stmt->bindParam($attribute_name, $attribute_value, PDO::PARAM_STR);
+			}
 
-	return $stmt;
-}
+		} else {
+			$query = "SET @randoms = (
+			SELECT GROUP_CONCAT(id) FROM (
+			SELECT DISTINCT id FROM questions
+			ORDER BY RAND() 
+			LIMIT :amount
+			) AS ids);";
 
-private function buildWhereClause($attributes) {
-
-	$where = "";
-
-	if (count($attributes)) {
-		$where = "WHERE ";
-		$delimiter = "";
-
-		foreach ($attributes as $attr_name => $attr_value) {
-			$where .= "{$delimiter}{$attr_name}='{$attr_value}'";
-			$delimiter = " AND ";
+			// Prepare statement
+			$stmt = $this->conn->prepare($query);
 		}
+
+		$stmt->bindParam('amount', $request_breakdown['amount'], PDO::PARAM_INT);
+
+		$stmt->execute();
+
+		$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct
+		FROM questions q
+		INNER JOIN answers a ON q.id=a.question_id
+		INNER JOIN categories c ON q.category = c.id
+		WHERE FIND_IN_SET(question_id, @randoms);";
+
+		// Prepare statement
+		$stmt = $this->conn->prepare($query);
+		// Execute query
+		$stmt->execute();
+
+		return $stmt;
 	}
 
-	if ($this->token !== false) {
-		// Get previously-retrieved ids for this token
-		$retrieved = $this->token->retrieved();
+	private function buildWhereClause($attributes) {
 
-		if(strlen($retrieved) > 0) {
-				//Exclude previously-retrieved ids from results
-			if (strlen($where) === 0) {
-				$where = "WHERE id NOT IN ($retrieved)";
-			} else {
-				$where .= "AND id NOT IN ($retrieved)";
+		$required = false;
+
+		$where = "";
+
+		if (count($attributes)) {
+			$required = true;
+			$delimiter = "";
+
+			foreach ($attributes as $attr_name => $attr_value) {
+				$where .= "{$delimiter}{$attr_name}=:$attr_name";
+				$delimiter = " AND ";
 			}
 		}
+
+		if ($this->token !== false) {
+			// Get previously-retrieved ids for this token
+			$retrieved = $this->token->retrieved();
+
+			if(strlen($retrieved) > 0) {
+					//Exclude previously-retrieved ids from results
+				if (!required) {
+					$required = true;
+					$where = "id NOT IN ($retrieved)";
+				} else {
+					$where .= "AND id NOT IN ($retrieved)";
+				}
+			}
+		}
+		return $required ? $where : false;
 	}
-	return $where;
-}
 }
