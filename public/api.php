@@ -97,12 +97,21 @@ $question_item = $encoder->encodeItem($question_item, $request_breakdown['encode
 array_push($questions_arr['results'], $question_item);
 
 // Can't just check num rows as each question has multiple, so we either check this here after assembling the questions or do a separate DB call to check
+$below_quota = count($retrieved) !== (int)$request_breakdown['amount'];
+
 if ($token) {
-	if (count($retrieved) !== (int)$request_breakdown['amount']) {
+	if ($below_quota) {
 		token_empty();
 	}	
 	// Write question ids to token
 	$token->update($retrieved);
+} else if ($below_quota) {
+	// Query returned too few questions - no token, so this is a code 1
+	error_log("CODE 1\n");
+	die(json_encode(array(
+		'response_code' => 1,
+		'results' => array()
+	)));
 }
 
 // Output as JSON
@@ -114,7 +123,7 @@ echo json_encode($questions_arr);
  * @return Array containing empty token response code and empty results array
  */ 
 function token_empty() {
-	// Query returned incorrect number of questions
+	// Query returned too few questions
 	die(json_encode(array(
 		'response_code' => 4,
 		'results' => array()
