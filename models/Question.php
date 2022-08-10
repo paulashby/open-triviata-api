@@ -77,7 +77,6 @@ Class Question {
 			// Prepare statement
 			$stmt = $this->conn->prepare($query);
 		}
-
 		$stmt->bindParam('amount', $request_breakdown['amount'], PDO::PARAM_INT);
 
 		$stmt->execute();
@@ -117,12 +116,12 @@ Class Question {
 			$retrieved = $this->token->retrieved();
 
 			if(strlen($retrieved) > 0) {
-					//Exclude previously-retrieved ids from results
-				if (!required) {
+				//Exclude previously-retrieved ids from results
+				if (!$required) {
 					$required = true;
 					$where = "id NOT IN ($retrieved)";
 				} else {
-					$where .= "AND id NOT IN ($retrieved)";
+					$where .= " AND id NOT IN ($retrieved)";
 				}
 			}
 		}
