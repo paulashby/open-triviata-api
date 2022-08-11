@@ -4,7 +4,7 @@ header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 
 include_once "../config/Database.php";
-include_once "../models/question.php";
+include_once "../models/Question.php";
 include_once "../utilities/Validator.php";
 include_once "../utilities/RateLimiter/SlidingWindow.php";
 
