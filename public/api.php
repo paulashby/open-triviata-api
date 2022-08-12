@@ -97,7 +97,7 @@ $question_item = $encoder->encodeItem($question_item, $request_breakdown['encode
 array_push($questions_arr['results'], $question_item);
 
 // Can't just check num rows as each question has multiple, so we either check this here after assembling the questions or do a separate DB call to check
-$below_quota = count($retrieved) !== (int)$request_breakdown['amount'];
+$below_quota = isset($request_breakdown['amount']) && count($retrieved) !== (int)$request_breakdown['amount'];
 
 if ($token) {
 	if ($below_quota) {
