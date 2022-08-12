@@ -31,6 +31,7 @@ Class Token {
 				if (!unlink($token_file)) {
 					error_log("Unable to delete token file $token_file");
 				}
+				// Regardless of the outcome of the preceding unlink operation, this is still a show-stopper as the submitted token has expired
 				$this->notFound();
 			}
 		}
