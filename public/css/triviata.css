@@ -13,6 +13,9 @@ h1 {
 h3 {
 	margin-top: 0;
 }
+form h3.form-signin-heading {
+	margin-top: 21px;
+}
 a {
 	color: #ffff24;
 }
@@ -43,6 +46,9 @@ a:hover {
 }
 .btn-doc {
 	margin-top: 2.5rem;
+}
+#id-form {
+	display: none;
 }
 #btn-gen-url {
 	margin-bottom: 4rem;

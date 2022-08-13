@@ -30,20 +30,35 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 	$url = $base_url;
 	$delimiter = "api.php?";
 
-	foreach ($_POST as $param_name => $param_val) {
+	if (isset($_POST['ids'])) {
 
-		$param_val = filter_var($param_val, FILTER_SANITIZE_STRING);
+		$ids = $_POST['ids'];
 
-		if ($param_val !== "any" && $param_val !== "default"  && $param_name !== "token") {
-			$url .= $delimiter;
-			$url .= "$param_name=$param_val";
+		if (strlen($ids)) {
+			$url .= $delimiter . "ids=" . filter_var($ids, FILTER_SANITIZE_STRING);
 			$delimiter = "&";
+		}		
+
+		if ($_POST['encode'] !== "default") {
+			$url .= $delimiter . "encode=" . filter_var($_POST['encode'], FILTER_SANITIZE_STRING);
+		}
+	} else {
+		foreach ($_POST as $param_name => $param_val) {
+
+			$param_val = filter_var($param_val, FILTER_SANITIZE_STRING);
+
+			if ($param_val !== "any" && $param_val !== "default"  && $param_name !== "token") {
+				$url .= $delimiter;
+				$url .= "$param_name=$param_val";
+				$delimiter = "&";
+			}
 		}
 	}
 } else {
 	// Generate token for CSRF protection
 	$_SESSION['token'] = md5(uniqid(mt_rand(), true));
 }
+
 
 // Instantiate database and connect
 $database = new Database();
@@ -72,6 +87,8 @@ $conn = $database->connect();
 	
 	<!-- jQuery -->
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+	<script src="scripts/otriviata.js"></script>
 
 	<script>
 	   // Prevent Firefox flash of unstyled content
@@ -177,10 +194,11 @@ $conn = $database->connect();
 				 			</ul>
 				 	</section>
 			</section>
-			<form  method='post' class='form-api'>
-				<h2 class='form-signin-heading'>API Helper</h2>
+			<form  method='post' class='form-api' id='param-form'>
+				<h3 class='form-signin-heading'>API Helper</h3>
+				<p>Use this form to build API requests. Alternatively, you can <a role='button' tabindex='0' id='id-form-button'>build a request using a list of question ID numbers</a>.</p>
 				<label for='amount'>Number of Questions:</label>
-				<input type='number' id='amount' class='form-control' name='amount' min='1' max='50' value='10'>
+				<input type='number' id='amount' class='form-control' name='amount' value='30' placeholder='Number of questions required' min='0' max='50'>
 
 				<?php 
 					// Get category data and render select menu accordingly
@@ -231,12 +249,23 @@ $conn = $database->connect();
 				<br>
 				<input type='submit' value='Generate API URL' id='btn-gen-url' class='btn btn-lg btn-primary btn-block'/>
 			</form>
+			<form  method='post' class='form-api' id='id-form'>
+				<h3 class='form-signin-heading'>API Helper - by question ID</h3>
+				<p>Use this form to build API requests using a list of question ID numbers. Alternatively, you can <a role='button' tabindex='1' id='param-form-button'>build a request by selecting from the available parameters</a>.</p>
+				<label for='ids'>Question ID Numbers:</label>
+					<input type='text' id='ids' class='form-control' name='ids' pattern='^\d+(,\d+)*$' placeholder='Comma-separated id numbers'>
+				<label for='encode'>Select Encoding:</label>
+				<select name='encode' id='encode' class='form-control'>
+					<option value='default'>Default Encoding</option>
+					<option value='urlLegacy'>Legacy URL Encoding</option>
+					<option value='url3986'>URL Encoding (RFC 3986)</option>
+					<option value='base64'>Base64 Encoding</option>
+				</select>
+				<input type='hidden' name='token' value='<?php echo $_SESSION["token"] ?? "" ?>'>
+				<br>
+				<input type='submit' value='Generate API URL' id='btn-gen-url' class='btn btn-lg btn-primary btn-block'/>
+			</form>
 		</section>
 	</div>
-	<script>
-		$('#btn-doc').click(function() {
-			$('#apiInfo').toggle('fast');
-		})
-	</script>
 </body>
 </html>
