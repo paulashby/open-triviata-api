@@ -81,7 +81,7 @@ Class Token {
 	/**
 	 * Get existing data for this token
 	 *
-	 * @return array of question ids or empty array if no data has yet been stored in the token file
+	 * @return Array of question ids or empty array if no data has yet been stored in the token file
 	 */ 
 	private function data() {
 		$token_data = file($this->token_file);
