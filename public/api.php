@@ -79,16 +79,10 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 			'incorrect_answers' => array()
 		);
 	}
-
-	if($type == "boolean") {
-		$question_item['correct_answer'] = $correct ? "True" : "False";
-		$question_item['incorrect_answers'][] = $correct ? "False" : "True";
-
-	} else if($correct) {
-		// Multiple choice
+	if($correct) {
 		$question_item['correct_answer'] = $answer;
 	} else {
-		$question_item["incorrect_answers"][] = $answer;
+		$question_item['incorrect_answers'][] = $answer;
 	}
 }
 // Process final item as this isn't handled in while loop
