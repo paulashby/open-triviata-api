@@ -22,11 +22,7 @@ Class Validator {
 		)
 	);
 
-	private $query_config = array(
-		'attributes'	=> array(),
-		'encode' 		=> 'default'
-	);
-
+	private $query_config;
 	private $max_questions;
 	
 	public function __construct($url, $max_questions) {
@@ -37,8 +33,8 @@ Class Validator {
 		$parts = parse_url($url, PHP_URL_QUERY);
 		parse_str($parts, $query_params);
 
-		// Validate (and effectively sanitise) values
-		$this->clean($query_params);		
+		// Update $query_config with validated (and effectively sanitised) input values
+		$this->query_config = $this->makeCleanConfig($query_params);
 	}
 	public function validate() {
 		return $this->query_config;
@@ -49,9 +45,14 @@ Class Validator {
 	 *
 	 * @param array $query_params: parameter name/value pairs
 	 */ 
-	private function clean($query_params) {
+	private function makeCleanConfig($query_params) {
 
-		return array_key_exists('ids', $query_params) ? $this->cleanIDs($query_params) : $this->cleanParams($query_params);
+		$query_config = array(
+			'attributes'	=> array(),
+			'encode' 		=> 'default'
+		);
+
+		return array_key_exists('ids', $query_params) ? $this->cleanIDs($query_params, $query_config) : $this->cleanParams($query_params, $query_config);
 
 	}
 
@@ -60,12 +61,12 @@ Class Validator {
 	 *
 	 * @param array $query_params: parameter name/value pairs
 	 */ 
-	private function cleanIDs($query_params) {
+	private function cleanIDs($query_params, $query_config) {
 
 		$ids = explode(',', $query_params['ids']);
 
-		$this->query_config['ids'] = array_filter($ids, array($this, 'validateNumeric'));
-		$this->query_config['ids'] = $ids;
+		$query_config['ids'] = array_filter($ids, array($this, 'validateNumeric'));
+		$query_config['ids'] = $ids;
 
 		if (isset($query_params['encode'])) {
 
@@ -74,9 +75,9 @@ Class Validator {
 			if (!in_array($encode, self::PARAMS['encode'])) {
 				die($this->invalidParameter());
 			}
-			$this->query_config['encode'] = $encode;
+			$query_config['encode'] = $encode;
 		}
-
+		return $query_config;
 	}
 
 	/**
@@ -84,7 +85,7 @@ Class Validator {
 	 *
 	 * @param array $query_params: parameter name/value pairs
 	 */ 
-	private function cleanParams($query_params) {
+	private function cleanParams($query_params, $query_config) {
 
 		foreach ($query_params as $param_name => $param_value) {
 
@@ -101,10 +102,10 @@ Class Validator {
 				// Parameter value accepted
 				if ($param_name === 'encode') {
 					// encode is stored separately so we don't pollute $query_config['attributes'] which is used to build WHERE clause of MySQL query
-					$this->query_config['encode'] = $param_value;
+					$query_config['encode'] = $param_value;
 					continue;
 				}
-				$this->query_config['attributes'][$param_name] = $param_value;
+				$query_config['attributes'][$param_name] = $param_value;
 				continue;
 			}
 			// Use provided validation function
@@ -112,17 +113,18 @@ Class Validator {
 
 			if ($param_name === 'amount' || $param_name === 'token') {
 				// amount is stored separately so we don't pollute $query_config['attributes'] which is used to build WHERE clause of MySQL query
-				$this->query_config[$param_name] = $param_value;
+				$query_config[$param_name] = $param_value;
 				continue;
 			} 			
-			$this->query_config['attributes'][$param_name] = $param_value;
+			$query_config['attributes'][$param_name] = $param_value;
 		}
 		// Ensure amount is set and within limit
-		if (isset($this->query_config['amount'])) {
-			$this->query_config['amount'] = min($this->query_config['amount'], $this->max_questions);
+		if (isset($query_config['amount'])) {
+			$query_config['amount'] = min($query_config['amount'], $this->max_questions);
 		} else {
-			$this->query_config['amount'] = $this->max_questions;
+			$query_config['amount'] = $this->max_questions;
 		}
+		return $query_config;
 	}
 	
 	/**
