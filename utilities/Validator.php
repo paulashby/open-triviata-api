@@ -16,9 +16,10 @@ Class Validator {
 			"boolean"
 		),
 		'encode' 	 => array(
-			'urlLegacy',
-			'base64',
-			'url3986'
+			"urlLegacy",
+			"base64",
+			"url3986",
+			"none"
 		)
 	);
 

@@ -154,8 +154,7 @@ $conn = $database->connect();
 
 							<h3>Encoding Types</h3>
 							<p>
-								The Open Triviata Database may contain questions which contain Unicode or Special Characters. For this reason, the API returns results in a encoded format. You can specify the desired encoding format
-								using the examples below. If the encode type is not present in the URL, it will follow the default encoding.
+								The Open Triviata Database may contain questions which contain Unicode or Special Characters. For this reason, the API returns results in a encoded format. You can specify the desired encoding format using the examples below. If the encode type is not present in the URL, it will follow the default encoding. To disable encoding use the value &lsquo;none&rsquo;.
 							</p>
 							<p>
 								API Call with Encode Type (urlLegacy, url3986, base64):<input type='text' class='form-control' value='<?=$base_url?>api.php?amount=10&amp;encode=url3986' readonly=''>

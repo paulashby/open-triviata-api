@@ -47,8 +47,8 @@ if ($token && $num === 0 ) {
 }
 
 $retrieved = array();
-$questions_arr = array();
-$questions_arr['results'] = array();
+$question_arr = array();
+$question_arr['results'] = array();
 $question_item = array(
 	'id' => 0
 );
@@ -65,9 +65,11 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 		// New question or first in list
 		if(count($question_item) > 1) {
 			// This is a new question - push to results and start new
-			$question_item = $encoder->encodeItem($question_item, $request_breakdown['encode']);
+			if ($request_breakdown['encode'] !== "none") {
+				$question_item = $encoder->encodeItem($question_item, $request_breakdown['encode']);				
+			}
 			// Push to results
-			array_push($questions_arr['results'], $question_item); 
+			array_push($question_arr['results'], $question_item); 
 		}
 		$question_item = array(
 			'category' 			=> $category,
@@ -88,7 +90,7 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 // Process final item as this isn't handled in while loop
 $question_item = $encoder->encodeItem($question_item, $request_breakdown['encode']);
 // Push final item to results
-array_push($questions_arr['results'], $question_item);
+array_push($question_arr['results'], $question_item);
 
 // Can't just check num rows as each question has multiple, so we either check this here after assembling the questions or do a separate DB call to check
 $below_quota = isset($request_breakdown['amount']) && count($retrieved) !== (int)$request_breakdown['amount'];
@@ -109,7 +111,7 @@ if ($token) {
 }
 
 // Output as JSON
-echo json_encode($questions_arr);
+echo json_encode($question_arr);
 
 /**
  * Provide Empty Token response
