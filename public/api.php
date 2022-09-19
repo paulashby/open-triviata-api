@@ -88,7 +88,9 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 	}
 }
 // Process final item as this isn't handled in while loop
-$question_item = $encoder->encodeItem($question_item, $request_breakdown['encode']);
+if ($request_breakdown['encode'] !== "none") {
+	$question_item = $encoder->encodeItem($question_item, $request_breakdown['encode']);
+}
 // Push final item to results
 array_push($question_arr['results'], $question_item);
 
