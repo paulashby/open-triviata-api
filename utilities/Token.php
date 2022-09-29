@@ -20,7 +20,6 @@ Class Token {
 		} else {
 			if (!file_exists($token_file)) {
 				// Expired token files may have been deleted by cron job.
-				//TODO: need cron job on the unlimited server to remove token files when they're older than 6 hours
 				$this->notFound();
 			}
 
