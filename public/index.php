@@ -61,7 +61,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 
 
 // Instantiate database and connect
-$database = new Database();
+$database = new Database($apiconfig);
 $conn = $database->connect();
 
 ?>
@@ -76,7 +76,7 @@ $conn = $database->connect();
 	<meta name="theme-color" content="#87c5f1">
 	
 	<!-- Bootstrap Core CSS -->
-	<link rel="stylesheet" href="https://opentdb.com/css/bootstrap.min.css" type="text/css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<link rel="stylesheet" href="/css/triviata.css" type="text/css">
 	
 	<!-- Custom Fonts -->

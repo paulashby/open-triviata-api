@@ -1,5 +1,6 @@
 body {
 	background-color: #383e4e;
+	color:  #fff;
 }
 .container {
 	margin-top: 4rem;
@@ -69,4 +70,8 @@ a:hover {
 .alert-success {
 	background-color: #f95326;
 	border-color: #f95326;
+}
+.well {
+	background-color: #303030;
+	border: 1px solid transparent;
 }
