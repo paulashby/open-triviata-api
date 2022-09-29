@@ -189,7 +189,7 @@ $conn = $database->connect();
 							<ul>
 				 				<li>Only 1 Category can be requested per API Call. To get questions from any category, don&apos;t specify a category.</li>
 				 				<li>A Maximum of 50 Questions can be retrieved per call.</li>
-				 				<li>Maximum of <?=REQUESTS_PER_MINUTE?> requests per minute.</li>
+				 				<li>Maximum of <?=$apiconfig['req_per_minute']?> requests per minute.</li>
 				 			</ul>
 				 	</section>
 			</section>
