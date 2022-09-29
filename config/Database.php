@@ -9,10 +9,8 @@ Class Database {
 	private $conn;
 
 	// Constructor with DB
-	public function __construct() {
+	public function __construct($credentials) {
 
-		$credentials = parse_ini_file(realpath(__DIR__ . "/../") . "/apiconfig.ini");
-		
 		$this->host = $credentials['host'];
 		$this->db_name = $credentials['db_name'];
 		$this->username = $credentials['username'];
