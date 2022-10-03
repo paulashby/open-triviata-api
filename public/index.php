@@ -243,6 +243,7 @@ $conn = $database->connect();
 					<option value='urlLegacy'>Legacy URL Encoding</option>
 					<option value='url3986'>URL Encoding (RFC 3986)</option>
 					<option value='base64'>Base64 Encoding</option>
+					<option value='none'>None</option>
 				</select>
 				<input type='hidden' name='token' value='<?php echo $_SESSION["token"] ?? "" ?>'>
 				<br>
@@ -259,6 +260,7 @@ $conn = $database->connect();
 					<option value='urlLegacy'>Legacy URL Encoding</option>
 					<option value='url3986'>URL Encoding (RFC 3986)</option>
 					<option value='base64'>Base64 Encoding</option>
+					<option value='none'>None</option>
 				</select>
 				<input type='hidden' name='token' value='<?php echo $_SESSION["token"] ?? "" ?>'>
 				<br>
