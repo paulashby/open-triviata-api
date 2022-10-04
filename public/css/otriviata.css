@@ -1,0 +1,59 @@
+body {
+	height: 100vh;
+}
+#logo {
+	margin: 3rem 0;
+}
+h1 {
+	display: none
+}
+h2 {
+	font-size: 1.65rem;
+}
+h3 {
+	font-size: 1.4rem;
+}
+.ot-bg {
+	background-color: #383e4e;
+}
+.ot-doc-title {
+	background-color: #f95326;
+	padding: 0.6rem 1rem;
+}
+.ot-doc h3 {
+	margin-bottom: -15px;
+}
+.ot-doc-label {
+	display: block;
+	margin-bottom: 5px;
+}
+.uk-input.ot-doc-eg {
+	/* https://stackoverflow.com/questions/38781089/font-family-monospace-monospace */
+	font-family: monospace, monospace;
+	color: rgba(255,255,255,1);
+	font-size: 0.94rem;
+}
+.uk-form-controls + .ot-doc-label {
+	margin-top: 2rem;
+}
+.ot-code-table {
+	border: none;
+	margin-top: 1rem;
+}
+.ot-code-table tr:nth-child(even) {
+	background-color: #232731;
+}
+.ot-code-table td{
+	padding: 0.5rem;
+	vertical-align: top;
+}
+.ot-col-code {
+	text-align: center;
+	width: 10%;
+}
+.ot-col-status {
+	width:  90%;
+}
+.ot-code-num {
+	text-align: center;
+}
