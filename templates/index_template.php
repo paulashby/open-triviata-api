@@ -35,14 +35,14 @@
 		<ul uk-accordion class="ot-doc">
 		    <li>
 		        <a class="uk-accordion-title ot-doc-title" href="#">API Documentation</a>
-		        <div class="uk-accordion-content">
+		        <div class="uk-accordion-content ot-doc-content">
 		        	<h3>Getting Started</h3>
 		        	<p>To get started using the Open Triviata Database API, use this URL: </p>
 	        		<div class="uk-form-controls">
 	        			<input type="text" class="uk-input ot-doc-eg" value="<?=$base_url?>api.php?amount=10" readonly="">
 	        		</div>
 	        		<p>For more settings or help using the API, read along below. Alternatively, you can use the &lsquo;Build a Request&rsquo; form to craft your specific query.</p>
-		        	<p>To retrieve one or more questions by ID number, simply use the 'ids' parameter with a comma-separated list (NOTE: all other parameters will be discarded with the exception of encode - see below):</p>
+		        	<p>To retrieve one or more questions by ID number, simply use the 'ids' parameter with a comma-separated list (NOTE: all other parameters will be discarded with the exception of encode):</p>
 	        		<div class="uk-form-controls">
 	        			<input type="text" class="uk-input ot-doc-eg" value="<?=$base_url?>api.php?ids=1,500,1000" readonly="">
 	        		</div>
@@ -91,16 +91,62 @@
 		        			<td><b>Token Empty</b> Session Token has returned all possible questions for given query. Token should be reset.</td>
 		        		</tr>
 		        	</table>
+		        	<h3>Encoding Types</h3>
+		        	<p>The Open Triviata Database may contain questions which contain Unicode or Special Characters. For this reason, the API returns results in a encoded format. You can specify the desired encoding format using the examples below. If the encode type is not present in the URL, it will follow the default encoding. To disable encoding use the value &lsquo;none&rsquo;.</p>
+		        	<label for="using-st" class="uk-form-label ot-doc-label">API Call with Encode Type (urlLegacy, url3986, base64, none):</label>
+	        		<div class="uk-form-controls">
+	        			<input type="text" id="using-st" class="uk-input ot-doc-eg" value="<?=$base_url?>api.php?amount=10&amp;encode=url3986" readonly="">
+	        		</div>
+		        	<p>Example Sentence (Non Encoded): &lsquo;Don't forget that π = 3.14 &amp; doesn't equal 3.&rsquo;</p>
+		        	<label for="using-st" class="uk-form-label ot-doc-label">Default Encoding (HTML Codes):</label>
+	        		<div class="uk-form-controls">
+	        			<input type="text" id="using-st" class="uk-input ot-doc-eg" value="Don&amp;‌#039;t forget that &amp;‌pi; = 3.14 &amp;‌amp; doesn&amp;‌#039;t equal 3." readonly="">
+	        		</div>
+		        	<label for="using-st" class="uk-form-label ot-doc-label">Legacy URL Encoding:</label>
+	        		<div class="uk-form-controls">
+	        			<input type="text" id="using-st" class="uk-input ot-doc-eg" value="Don%27t+forget+that+%CF%80+%3D+3.14+%26+doesn%27t+equal+3." readonly="">
+	        		</div>
+		        	<label for="using-st" class="uk-form-label ot-doc-label">URL Encoding (<a href='https://www.ietf.org/rfc/rfc3986.txt'>RFC 3986</a>):</label>
+	        		<div class="uk-form-controls">
+	        			<input type="text" id="using-st" class="uk-input ot-doc-eg" value="Don%27t%20forget%20that%20%CF%80%20%3D%203.14%20%26%20doesn%27t%20equal%203." readonly="">
+	        		</div>
+		        	<label for="using-st" class="uk-form-label ot-doc-label">Base64 Encoding:</label>
+	        		<div class="uk-form-controls">
+	        			<input type="text" id="using-st" class="uk-input ot-doc-eg" value="RG9uJ3QgZm9yZ2V0IHRoYXQgz4AgPSAzLjE0ICYgZG9lc24ndCBlcXVhbCAzLg==" readonly="">
+	        		</div>
+		        	<label for="using-st" class="uk-form-label ot-doc-label">None:</label>
+	        		<div class="uk-form-controls">
+	        			<input type="text" id="using-st" class="uk-input ot-doc-eg" value="Don't forget that xcfx80 = 3.14 & doesn't equal 3." readonly="">
+	        		</div>
+	        		<h3>API Helper Tools</h3>
+		        	<p>There are some functions in the API which can be useful to developers.</p>
+		        	<label for="using-st" class="uk-form-label ot-doc-label"><b>Category Lookup:</b> Returns the entire list of categories and ids in the database.</label>
+	        		<div class="uk-form-controls">
+	        			<input type="text" id="using-st" class="uk-input ot-doc-eg" value="<?=$base_url?>api_category.php" readonly="">
+	        		</div>
+		        	<label for="using-st" class="uk-form-label ot-doc-label"><b>Category Question Count Lookup:</b> Returns the number of questions in the database, in a specific category.</label>
+	        		<div class="uk-form-controls">
+	        			<input type="text" id="using-st" class="uk-input ot-doc-eg" value="<?=$base_url?>api_count.php?category=CATEGORY_ID_HERE" readonly="">
+	        		</div>
+		        	<label for="using-st" class="uk-form-label ot-doc-label"><b>Global Question Count Lookup:</b> Returns the number of ALL questions in the database. Note: while <a href='https://opentdb.com/'>The Open Trivia Database</a> provides additional counts for Pending, Verified, and Rejected questions, The Open Triviata Database provides only verified questions.</label>
+	        		<div class="uk-form-controls">
+	        			<input type="text" id="using-st" class="uk-input ot-doc-eg" value="<?=$base_url?>api_count_global.php" readonly="">
+	        		</div>
+	        		<h3>Limitations</h3>
+		        	<ul class="uk-list uk-list-divider">
+		 				<li>Only 1 Category can be requested per API Call. To get questions from any category, don&apos;t specify a category.</li>
+		 				<li>A Maximum of 50 Questions can be retrieved per call.</li>
+		 				<li>Maximum of <?=$apiconfig['req_per_minute']?> requests per minute.</li>
+		 			</ul>
 		        </div>
 		    </li>
 		</ul>
 		<h2>Build a Request</h2>
 		<div uk-filter="target: .req-type-filter">
-			<ul class="uk-subnav uk-subnav-pill" uk-switcher="animation: uk-animation-slide-top">
-				<li><a href="#">Use Question IDs</a></li>
-		        <li><a href="#">Use Parameters</a></li>
+			<ul class="uk-subnav uk-subnav-pill" uk-switcher="animation: uk-animation-fade">
+				<li><a href="#">Using Question IDs</a></li>
+		        <li><a href="#">Using Parameters</a></li>
 		    </ul>
-			<!-- <ul class="req-type-filter uk-child-width-1-2@s"> -->
 			<ul class="uk-switcher uk-margin">
 			    <li>
 		        	<form method="post" class="uk-form-stacked" style="display: block;">

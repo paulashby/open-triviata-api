@@ -20,6 +20,9 @@ h3 {
 	background-color: #f95326;
 	padding: 0.6rem 1rem;
 }
+.ot-doc-content h3:first-child {
+	margin-top: 1.1rem;
+}
 .ot-doc h3 {
 	margin-bottom: -15px;
 }
@@ -37,13 +40,20 @@ h3 {
 	margin-top: 2rem;
 }
 .ot-code-table {
-	border: none;
-	margin-top: 1rem;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-collapse: collapse;
+	margin-top: 2rem;
+}
+.ot-code-table tr {
+	background-color: rgba(255,255,255,0.1);
 }
 .ot-code-table tr:nth-child(even) {
-	background-color: #232731;
+	background-color: rgba(255,255,255,0.05);
 }
-.ot-code-table td{
+.ot-code-table th {
+	padding: 0.5rem;
+}
+.ot-code-table td {
 	padding: 0.5rem;
 	vertical-align: top;
 }
