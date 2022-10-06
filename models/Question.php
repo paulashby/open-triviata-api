@@ -18,8 +18,8 @@ Class Question {
 	 * @param array $request_breakdown: parameter name/value pairs
 	 * @return array of retrieved question data
 	 */ 
-	public function read($request_breakdown) {
-		return array_key_exists('ids', $request_breakdown) ? $this->readByID($request_breakdown) : $this->readRandom($request_breakdown);
+	public function read($request_breakdown, $by_id) {
+		return $by_id ? $this->readByID($request_breakdown) : $this->readRandom($request_breakdown);
 	}
 
 	// Get questions with provided ids

@@ -35,8 +35,10 @@ if (isset($request_breakdown['token'])) {
 
 $question = new Question($db, $token);
 
+$by_id = array_key_exists('ids', $request_breakdown);
+
 // Question query
-$result = $question->read($request_breakdown);
+$result = $question->read($request_breakdown, $by_id);
 
 // Get row count
 $num = $result->rowCount();
@@ -93,6 +95,21 @@ if ($request_breakdown['encode'] !== "none") {
 // Push final item to results
 array_push($question_arr['results'], $question_item);
 
+if ($by_id) {
+	// Make sure we've retrieved all the requested questions
+	$unavailable = array_diff($request_breakdown['ids'], $retrieved);
+
+	if (count($unavailable)) {
+		// Return ids of unavailable questions with error code
+		die(json_encode(array(
+			'response_code' => 5,
+			'results' => array(
+				'unavailable' => $unavailable
+			)
+		)));
+	}
+}
+
 // Can't just check num rows as each question has multiple, so we either check this here after assembling the questions or do a separate DB call to check
 $below_quota = isset($request_breakdown['amount']) && count($retrieved) !== (int)$request_breakdown['amount'];
 
@@ -104,7 +121,6 @@ if ($token) {
 	$token->update($retrieved);
 } else if ($below_quota) {
 	// Query returned too few questions - no token, so this is a code 1
-	error_log("CODE 1\n");
 	die(json_encode(array(
 		'response_code' => 1,
 		'results' => array()
