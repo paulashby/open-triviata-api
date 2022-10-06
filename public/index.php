@@ -22,7 +22,6 @@ $base_url = "$scheme://$host/";
 if($_SERVER['REQUEST_METHOD'] == "POST") {
 
 	$token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_STRING);
-	error_log("Token: $token");
 
 	if (!$token || $token !== $_SESSION['token']) {
 	    header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
@@ -33,18 +32,21 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 	$delimiter = "api.php?";
 
 	if (isset($_POST['ids'])) {
-
+		// Retrieve questions by id
 		$ids = $_POST['ids'];
 
 		if (strlen($ids)) {
+			// Id numbers have been provided
 			$url .= $delimiter . "ids=" . filter_var($ids, FILTER_SANITIZE_STRING);
 			$delimiter = "&";
 		}		
 
 		if ($_POST['encode'] !== "default") {
+			// Include encoding scheme
 			$url .= $delimiter . "encode=" . filter_var($_POST['encode'], FILTER_SANITIZE_STRING);
 		}
 	} else {
+		// Build request url with parameters
 		foreach ($_POST as $param_name => $param_val) {
 
 			$param_val = filter_var($param_val, FILTER_SANITIZE_STRING);
@@ -64,6 +66,34 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 // Instantiate database and connect
 $database = new Database($apiconfig);
 $conn = $database->connect();
+
+// Get category data and render select menu accordingly
+$query = "SELECT id, category AS name FROM categories ORDER BY id;";
+// Run the query
+$stmt = $conn->prepare($query);
+$stmt->execute();
+
+// Get row count
+$num = $stmt->rowCount();
+
+$assembled_request = "";
+
+if (isset($url)) {
+	$assembled_request = "<div class='alert alert-success'>
+	<strong>API URL Generated!: </strong><input type='text' class='form-control' value=$url readonly=''>
+	</div>";
+}
+
+// Set up category select options
+$category_options = "<option value='any'>Any Category</option>";
+
+if ($num !== 0 ) {
+	while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+		extract($row); 
+		$category_options .= "<option value='$id'>$name</option>";
+	}
+}
 
 include_once "../templates/index_template.php";
 ?>
