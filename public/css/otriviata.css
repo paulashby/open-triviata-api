@@ -20,6 +20,20 @@ h3 {
 	background-color: #f95326;
 	padding: 0.6rem 1rem;
 }
+.ot-url-tile {	
+	/*background-color: #1d2028;*/
+	background-color: #272a31;	
+}
+.ot-url-tile--hide {
+	display: none;
+}
+.ot-url-tile .uk-input.ot-doc-eg {
+	color: rgba(255, 255, 255, 1);
+}
+.ot-url-tile .uk-form-label.ot-generated-url-label {
+	color: #ffff24;
+	font-size: 1rem;
+}
 .ot-doc-content h3:first-child {
 	margin-top: 1.1rem;
 }

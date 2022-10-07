@@ -28,11 +28,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 	    die();
 	}
 
+	
 	$url = $base_url;
 	$delimiter = "api.php?";
+	// Show url tile
+	$url_tile_modifier = "";
 
 	if (isset($_POST['ids'])) {
-		// Retrieve questions by id
+		// Build url to retrieve questions by id
 		$ids = $_POST['ids'];
 
 		if (strlen($ids)) {
@@ -59,10 +62,15 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 		}
 	}
 } else {
+	$url = "";
+	// Hide url tile
+	$url_tile_modifier = " ot-url-tile--hide";
+	$assembled_request = "";
 	// Generate token for CSRF protection
 	$_SESSION['token'] = md5(uniqid(mt_rand(), true));
 }
-
+// Token for forms
+$form_token = $_SESSION['token'] ?? "";
 // Instantiate database and connect
 $database = new Database($apiconfig);
 $conn = $database->connect();
@@ -75,21 +83,11 @@ $stmt->execute();
 
 // Get row count
 $num = $stmt->rowCount();
-
-$assembled_request = "";
-
-if (isset($url)) {
-	$assembled_request = "<div class='alert alert-success'>
-	<strong>API URL Generated!: </strong><input type='text' class='form-control' value=$url readonly=''>
-	</div>";
-}
-
 // Set up category select options
 $category_options = "<option value='any'>Any Category</option>";
 
 if ($num !== 0 ) {
 	while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-
 		extract($row); 
 		$category_options .= "<option value='$id'>$name</option>";
 	}

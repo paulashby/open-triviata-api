@@ -15,13 +15,19 @@
 		<script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/uikit@3.15.10/dist/js/uikit-icons.min.js"></script>
 
+		<script src="scripts/otriviata.js"></script>
 		<link rel="stylesheet" href="/css/otriviata.css" type="text/css">
-
 	</head>
 	<body>
 		<div class="uk-container uk-container-xsmall">
 			<img src="/img/open-triviata-logo.svg" alt="Open Triviata logo" width="200" id="logo">
-			<?php echo $assembled_request; ?>
+			<div class="uk-tile uk-tile-primary uk-padding-small uk-border-rounded ot-url-tile<?php echo $url_tile_modifier; ?>">
+				<a role="button" id="copy-button" class="ot-icon-copy uk-float-right" uk-icon="icon: copy"></a>
+				<label for="generated_url" class="uk-form-label ot-generated-url-label uk-float-left">API URL:</label>
+				<div class="uk-form-controls" style="width: 100%;">
+					<input type="text" id="generated_url" class="uk-input ot-doc-eg uk-margin-small-bottom uk-margin-small-top" value=" <?php echo $url; ?>" readonly="">
+				</div>
+			</div>
 			<h1>Open Triviata API</h1>
 			<p>The Open Triviata Database provides a completely free JSON API for use in programming projects, providing questions sourced from <a href='https://opentdb.com/'>The Open Trivia Database</a>. If you don&apos;t need question ID numbers or unencoded data, the original Open Trivia Database will serve you perfectly well :)</p>
 			<p>All data provided by the API is available under the Creative Commons Attribution-ShareAlike 4.0 International License. <a href="https://creativecommons.org/licenses/by-sa/4.0/"><img src="https://licensebuttons.net/l/by-sa/4.0/80x15.png" alt="Creative Commons logo"></a></p>
@@ -165,7 +171,7 @@
 									</select>
 								</div>
 							</div>
-							<input type="hidden" name="token" value="a183298435042426354a25c5dda529c8">
+							<input type="hidden" name="token" value="<?php echo $form_token; ?>">
 							<button class="uk-button uk-button-default" value="Generate API URL">Generate API URL</button>
 						</form>
 					</li>
@@ -218,7 +224,7 @@
 									</select>
 								</div>
 							</div>
-							<input type="hidden" name="token" value="a183298435042426354a25c5dda529c8">
+							<input type="hidden" name="token" value="<?php echo $form_token; ?>">
 							<button class="uk-button uk-button-default" value="Generate API URL">Generate API URL</button>
 						</form>
 					</li>
