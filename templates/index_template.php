@@ -21,7 +21,7 @@
 	<body>
 		<div class="uk-container uk-container-xsmall">
 			<img src="/img/open-triviata-logo.svg" alt="Open Triviata logo" width="200" id="logo">
-			<div class="uk-tile uk-tile-primary uk-padding-small uk-border-rounded ot-url-tile<?php echo $url_tile_modifier; ?>">
+			<div class="uk-tile uk-tile-primary uk-padding-small uk-border-rounded uk-animation-scale-up ot-url-tile<?php echo $url_tile_modifier; ?>">
 				<a role="button" id="copy-button" class="ot-icon-copy uk-float-right" uk-icon="icon: copy"></a>
 				<label for="generated_url" class="uk-form-label ot-generated-url-label uk-float-left">API URL:</label>
 				<div class="uk-form-controls" style="width: 100%;">
@@ -146,7 +146,7 @@
 			</ul>
 			<h2>Build a Request</h2>
 			<div uk-filter="target: .req-type-filter">
-				<ul class="uk-subnav uk-subnav-pill" uk-switcher="animation: uk-animation-fade">
+				<ul class="uk-subnav uk-subnav-pill" uk-switcher="animation: uk-animation-scale-up">
 					<li><a href="#">Using Question IDs</a></li>
 					<li><a href="#">Using Parameters</a></li>
 				</ul>
