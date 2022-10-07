@@ -1,4 +1,6 @@
 <?php
+// Basics of PDO interactions
+// https://www.youtube.com/watch?v=OEWXbpUMODk
 
 Class Question {
 	
@@ -50,6 +52,9 @@ Class Question {
 		$where_clause = $this->buildWhereClause($attributes);
 
 		if ($where_clause) {
+
+			// Set variable prior to query
+			// https://stackoverflow.com/questions/24958367/php-pdo-using-mysql-variables
 
 			$query = "SET @randoms = (
 			SELECT GROUP_CONCAT(id) FROM (

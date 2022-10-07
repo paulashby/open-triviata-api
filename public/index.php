@@ -1,5 +1,6 @@
 <?php
 
+// The content for this page is largely lifted from the Open Trivia Databse API documentation page at https://opentdb.com/api_config.php. The HTML is my own, making use of the UIKit css framework
 include_once "../config/Database.php";
 include_once "../utilities/RateLimiter/SlidingWindow.php";
 
@@ -31,7 +32,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 	
 	$url = $base_url;
 	$delimiter = "api.php?";
-	// Show url tile
+
+	// Url tile is shown when modifier is empty string
 	$url_tile_modifier = "";
 
 	if (isset($_POST['ids'])) {
@@ -92,6 +94,5 @@ if ($num !== 0 ) {
 		$category_options .= "<option value='$id'>$name</option>";
 	}
 }
-
 include_once "../templates/index_template.php";
 ?>

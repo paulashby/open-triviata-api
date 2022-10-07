@@ -9,6 +9,8 @@ include_once "../utilities/Validator.php";
 include_once "../utilities/RateLimiter/SlidingWindow.php";
 
 $ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
+
+// https://stackoverflow.com/questions/42700310/how-to-reference-to-a-folder-that-is-above-document-root-in-php
 $apiconfig = parse_ini_file(realpath(__DIR__ . "/../") . "/apiconfig.ini");
 $max_questions = $apiconfig['max_questions'];
 
@@ -55,6 +57,9 @@ $question_item = array(
 );
 
 while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+
+	// Basics of accessing row data @ 26:14
+	// https://www.youtube.com/watch?v=OEWXbpUMODk
 
 	extract($row); // This allows us to access fields directly ($id) rather than via row ($row['id'])
 
