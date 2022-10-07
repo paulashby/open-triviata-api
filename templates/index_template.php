@@ -160,7 +160,7 @@
 							<div class="uk-margin">
 								<label for="ids" class="uk-form-label">Question ID Numbers:</label>
 								<div class="uk-form-controls">
-									<input type="text" id="ids" class="uk-input" name="ids" pattern="^\d+(,\d+)*$" placeholder="Comma-separated id numbers">
+									<input type="text" id="ids" class="uk-input" name="ids" pattern="^\d+(,\d+)*$" placeholder="Comma-separated id numbers" required>
 								</div>
 							</div>
 							<div class="uk-margin">
