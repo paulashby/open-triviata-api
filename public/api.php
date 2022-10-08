@@ -64,11 +64,11 @@ while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 	extract($row); // This allows us to access fields directly ($id) rather than via row ($row['id'])
 
 	if($id !== $question_item['id']) {
+		// New question or first in list
 
 		// Keep record of retrieved question ids for current token so we can ensure unique results
 		$retrieved[] = $id;
 		
-		// New question or first in list
 		if(count($question_item) > 1) {
 			// This is a new question - push to results and start new
 			if ($request_breakdown['encode'] !== "none") {
