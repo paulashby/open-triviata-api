@@ -58,7 +58,7 @@ $question_item = array(
 
 while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 
-	// Basics of accessing row data @ 26:14
+	// Processing row data @ 26:14
 	// https://www.youtube.com/watch?v=OEWXbpUMODk
 
 	extract($row); // This allows us to access fields directly ($id) rather than via row ($row['id'])
