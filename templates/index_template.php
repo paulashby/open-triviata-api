@@ -23,8 +23,8 @@
 			<img src="/img/open-triviata-logo.svg" alt="Open Triviata logo" width="200" id="logo">
 			<div class="uk-tile uk-tile-primary uk-padding-small uk-border-rounded uk-animation-scale-up ot-url-tile<?php echo $url_tile_modifier; ?>">
 				<div id='ot-clipboard' class="uk-float-right">
-					<p class="uk-animation-fade ot-copy-status ot-copy-status--success uk-icon=" uk-icon="icon: check"></p>
-					<p class="uk-animation-fade ot-copy-status ot-copy-status--fail uk-icon=" uk-icon="icon: close"></p>
+					<p class="uk-animation-fade uk-animation-fast ot-copy-status ot-copy-status--success uk-icon=" uk-icon="icon: check"></p>
+					<p class="uk-animation-fade uk-animation-fast ot-copy-status ot-copy-status--fail uk-icon=" uk-icon="icon: close"></p>
 					<a role="button" id="copy-button" class="ot-icon-copy" uk-icon="icon: copy"></a>
 				</div>
 				<label for="generated-url" class="uk-form-label ot-generated-url-label uk-float-left">API URL:</label>
