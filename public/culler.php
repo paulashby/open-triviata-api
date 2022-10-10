@@ -17,6 +17,7 @@ foreach ($candidates as $candidate) {
 
 function cull($directory, $life) {
 
+    // https://stackoverflow.com/questions/3608202/php-code-to-traverse-a-directory-and-get-all-the-filesimages
     if ($handle = opendir($directory)) {
 
         $nowish = time();

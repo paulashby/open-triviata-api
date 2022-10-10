@@ -8,6 +8,8 @@ include_once "../models/Question.php";
 include_once "../utilities/Validator.php";
 include_once "../utilities/RateLimiter/SlidingWindow.php";
 
+// https://www.php.net/manual/en/function.filter-var.php
+// https://www.php.net/manual/en/filter.filters.validate.php
 $ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
 
 // https://stackoverflow.com/questions/42700310/how-to-reference-to-a-folder-that-is-above-document-root-in-php

@@ -28,8 +28,10 @@ Class Question {
 	private function readByID($request_breakdown) {
 
 		$ids = $request_breakdown['ids'];
+		// https://stackoverflow.com/questions/4729679/passing-values-to-mysql-in-operation-in-pdo-prepared-statement (see answer from mfonda)
 		$placeholder = implode(',', array_fill(0, count($ids), '?'));
 
+		// https://stackoverflow.com/questions/8322849/mysql-order-by-specific-id-values
 		$query = "SELECT q.id, c.category, q.type, q.difficulty, q.question_text, a.answer, a.correct
 		FROM questions q
 		INNER JOIN answers a ON q.id=a.question_id
@@ -55,7 +57,6 @@ Class Question {
 
 			// Set variable prior to query
 			// https://stackoverflow.com/questions/24958367/php-pdo-using-mysql-variables
-
 			$query = "SET @randoms = (
 			SELECT GROUP_CONCAT(id) FROM (
 			SELECT DISTINCT id FROM questions

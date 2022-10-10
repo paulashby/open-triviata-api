@@ -6,7 +6,11 @@ header("Content-Type: application/json");
 include_once "../utilities/RateLimiter/SlidingWindow.php";
 
 // Initialise rate limiter
+// https://www.php.net/manual/en/function.filter-var.php
+// https://www.php.net/manual/en/filter.filters.validate.php
 $ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
+
+// https://stackoverflow.com/questions/42700310/how-to-reference-to-a-folder-that-is-above-document-root-in-php
 $apiconfig = parse_ini_file(realpath(__DIR__ . "/../") . "/apiconfig.ini");
 $max_questions = $apiconfig['max_questions'];
 
@@ -15,6 +19,8 @@ $limiter = new SlidingWindow($apiconfig['req_per_minute'], $apiconfig['limit_all
 $limiter->limit($ip);
 
 // Parse request parameters
+// https://stackoverflow.com/questions/4730798/what-is-the-difference-between-serverrequest-uri-and-getq
+// https://stackoverflow.com/questions/11480763/how-can-i-get-parameters-from-a-url-string/11480852#11480852
 $parts = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
 parse_str($parts, $query_params);
 

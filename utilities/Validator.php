@@ -31,6 +31,8 @@ Class Validator {
 		$this->max_questions = $max_questions;
 
 		// Parse parameters and store in $query_params array
+		// https://stackoverflow.com/questions/4730798/what-is-the-difference-between-serverrequest-uri-and-getq
+		// https://stackoverflow.com/questions/11480763/how-can-i-get-parameters-from-a-url-string/11480852#11480852
 		$parts = parse_url($url, PHP_URL_QUERY);
 		parse_str($parts, $query_params);
 

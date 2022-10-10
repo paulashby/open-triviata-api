@@ -1,4 +1,6 @@
 <?php
+// Database connection setup
+// https://www.youtube.com/watch?v=OEWXbpUMODk
 
 Class Database {
 	// DB Params
@@ -8,7 +10,6 @@ Class Database {
 	private $password;
 	private $conn;
 
-	// Constructor with DB
 	public function __construct($credentials) {
 
 		$this->host = $credentials['host'];
@@ -17,7 +18,6 @@ Class Database {
 		$this->password = $credentials['password'];
 	}
 
-	// DB connect
 	public function connect() {
 		$this->conn = null;
 		try {
@@ -25,7 +25,7 @@ Class Database {
 			// Set the error mode
 			$this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch(PDOException $e) {
-			echo "Connection Error " . $e->getMessage();
+			trigger_error("Connection Error " . $e->getMessage(), E_USER_ERROR);
 		}
 
 		return $this->conn;

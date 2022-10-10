@@ -1,6 +1,6 @@
 <?php
+// The textual content for this page is largely lifted from the Open Trivia Databse API documentation page at https://opentdb.com/api_config.php. The HTML is my own, making use of the UIKit css framework
 
-// The content for this page is largely lifted from the Open Trivia Databse API documentation page at https://opentdb.com/api_config.php. The HTML is my own, making use of the UIKit css framework
 include_once "../config/Database.php";
 include_once "../utilities/RateLimiter/SlidingWindow.php";
 
@@ -8,6 +8,8 @@ include_once "../utilities/RateLimiter/SlidingWindow.php";
 // https://www.phptutorial.net/php-tutorial/php-csrf/
 session_start();
 
+// https://www.php.net/manual/en/function.filter-var.php
+// https://www.php.net/manual/en/filter.filters.validate.php
 $ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
 $apiconfig = parse_ini_file(realpath(__DIR__ . "/../") . "/apiconfig.ini");
 $max_questions = $apiconfig['max_questions'];
@@ -22,13 +24,13 @@ $base_url = "$scheme://$host/";
 
 if($_SERVER['REQUEST_METHOD'] == "POST") {
 
+	// https://www.phptutorial.net/php-tutorial/php-csrf/
 	$token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_STRING);
 
 	if (!$token || $token !== $_SESSION['token']) {
 	    header($_SERVER['SERVER_PROTOCOL'] . ' 405 Method Not Allowed');
 	    die();
 	}
-
 	
 	$url = $base_url;
 	$delimiter = "api.php?";
@@ -69,9 +71,11 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 	$url_tile_modifier = " ot-url-tile--hide";
 	$assembled_request = "";
 	// Generate token for CSRF protection
+	// https://www.phptutorial.net/php-tutorial/php-csrf/
 	$_SESSION['token'] = md5(uniqid(mt_rand(), true));
 }
 // Token for forms
+// https://stackoverflow.com/questions/5972516/best-way-to-give-a-variable-a-default-value-simulate-perl
 $form_token = $_SESSION['token'] ?? "";
 // Instantiate database and connect
 $database = new Database($apiconfig);
