@@ -8,7 +8,7 @@
 
 ## Description
 
-An API providing ID-numbered verified questions sourced from the [Open Trivia Database](https://opentdb.com/).
+The [Open Trivia Database API](https://otriviata.com/) provides ID-numbered verified questions sourced from the [Open Trivia Database](https://opentdb.com/).
 
 I was intending to use the Open Trivia Database to source questions for a website allowing users to create and share their own quizzes. While planning this, I discovered that the Open Trivia API does not return question IDs. This made the task of storing quizzes much trickier, so I decided that instead of creating a quiz site, I'd focus on creating something that might be useful to other developers - an API that *would* return ID numbers.
 
