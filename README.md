@@ -5,7 +5,9 @@
 ## Table of Contents
 
 [Description](#description)<br />[Usage](#usage)<br />[Contributing](#contributing)<br />[Questions](#questions)<br />
-## Description:
+
+## Description
+
 An API providing ID-numbered verified questions sourced from the [Open Trivia Database](https://opentdb.com/).
 
 I was intending to use the Open Trivia Database to source questions for a website allowing users to create and share their own quizzes. While planning this, I discovered that the Open Trivia API does not return question IDs. This made the task of storing quizzes much trickier, so I decided that instead of creating a quiz site, I'd focus on creating something that might be useful to other developers - an API that *would* return ID numbers.
@@ -27,7 +29,8 @@ I took the text for the index page from the Open Trivia API documentation webpag
 
 Given the fact that I was making the API available on a shared server, I also wrote a [rate limiter](https://github.com/paulashby/rate-limiter) (which turned out to be a bit of a project in itself). 
 
-## Usage:
+## Usage
+
 Please see the documentation on the [Open Trivia Database site](https://otriviata.com/).
 
 In addition to the static documentation, the page also allows you to build a request strings using either question ID numbers or the following parameters that follow the Open Trivia convention:
