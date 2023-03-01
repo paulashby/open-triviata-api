@@ -1,12 +1,14 @@
-# Open Triviata API
+# Open Triviata Database API
+
+<img src="./public/img/open-triviata-logo.svg" width="400" alt="Open Triviata logo"><br /><br />
 
 ## Table of Contents
 
 [Description](#description)<br />[Usage](#usage)<br />[Contributing](#contributing)<br />[Questions](#questions)<br />
 ## Description:
-An API providing ID-numbered verified questions sourced from the Open Trivia Database.
+An API providing ID-numbered verified questions sourced from the [Open Trivia Database](https://opentdb.com/).
 
-I was intending to use the [Open Trivia Database](https://opentdb.com/) to source questions for a website allowing users to create and share their own quizzes. While planning this, I discovered that the Open Trivia API does not return question IDs. This made the task of storing quizzes much trickier, so I decided that instead of creating a quiz site, I'd focus on creating something that might be useful to other developers - an API that *would* return ID numbers.
+I was intending to use the Open Trivia Database to source questions for a website allowing users to create and share their own quizzes. While planning this, I discovered that the Open Trivia API does not return question IDs. This made the task of storing quizzes much trickier, so I decided that instead of creating a quiz site, I'd focus on creating something that might be useful to other developers - an API that *would* return ID numbers.
 
 I broke the task into two major sub-projects - a [synchroniser programme](https://github.com/paulashby/open-triviata-synchroniser-php) to add all validated Open Trivia questions to the project database and this API to retrieve questions from my own synchronised database.
 
