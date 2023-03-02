@@ -27,7 +27,7 @@ Resetting a token empties the array in the json file.
 
 I took the text for the index page from the Open Trivia API documentation webpage, then made use of the UIKit framework when writing my own HTML, CSS and Javascript.
 
-Given the fact that I was making the API available on a shared server, I also wrote a [rate limiter](https://github.com/paulashby/rate-limiter) (which turned out to be a bit of a project in itself). 
+Given the fact that I was making the API available on a shared server, I also wrote a [rate limiter](https://github.com/paulashby/rate-limiter) for the project. 
 
 ## Usage
 
