@@ -46,4 +46,4 @@ If you feel you could contribute to the API in some way, simply fork the reposit
 
 ## Questions
 
-Feel free to [email me](mailto:paul@primitive.co?subject=OpenTriviataDatabase%20query%20from%20GitHub) with any queries. If you'd like to see some of my other projects, my GitHub user name is [paulashby](https://github.com/paulashby).
+Feel free to [email me](mailto:paul@primitive.co?subject=OpenTriviataDatabase%20query%20from%20GitHub) with any queries.
